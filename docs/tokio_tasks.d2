@@ -1,0 +1,80 @@
+# d2 fmt tokio_tasks.d2; d2 tokio_tasks.d2 - | oxvg optimise | save -f -r tokio_tasks.svg
+
+...@style
+
+MsgIn: MsgIn {
+  shape: oval
+}
+MsgIn -> Input
+
+Input
+Input -> SdoServer
+Input -> HeartbeatConsumer.Input
+Input -> NmtMaster
+Input -> NmtSlave
+Input -> RpdoConsumer.CanFrame
+Input -> SdoClient
+Input -> SyncConsumer
+Input -> OdChange
+
+HeartbeatConsumer: {
+  Input
+
+  Loop
+}
+HeartbeatConsumer.Loop -> Output
+HeartbeatConsumer.Loop -> NmtSlave
+
+HeartbeatProducer -> Output
+
+NmtMaster
+NmtMaster -> Output
+
+NmtSlave
+NmtSlave -> Output
+
+SyncProducer -> Output
+
+SyncConsumer
+SyncConsumer -> Output
+SyncConsumer -> TpdoProducer.Sync
+SyncConsumer -> RpdoConsumer.Sync
+
+SdoServer -> Output
+SdoServer -> TpdoProducer.OdChanged
+
+SdoClient
+SdoClient -> Output
+
+OdChange
+OdChange -> TpdoProducer.OdChanged
+
+RpdoConsumer: {
+  CanFrame
+  CanFrame -> Main
+
+  Sync
+  Sync -> Main
+
+  Main
+}
+RpdoConsumer.Main -> Output
+
+TpdoProducer: {
+  Sync
+  Sync -> Main
+
+  OdChanged
+  OdChanged -> Main
+
+  InhibitTimer
+  InhibitTimer -> Main
+
+  EventTimer
+  EventTimer -> Main
+
+  Main
+}
+TpdoProducer.Main -> Output
+
+Output

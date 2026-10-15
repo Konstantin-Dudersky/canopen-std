@@ -26,8 +26,8 @@ use socketcan::{CanFrame, CanSocket, Socket};
 
 use canopen_rs::datatypes::{DataType, Value};
 use canopen_rs::nmt::{encode_command, NMT_COMMAND_COB_ID};
-use canopen_rs::object_dictionary::Address;
-use canopen_rs::sdo::{SdoClient, SdoEvent};
+// use canopen_rs::object_dictionary1::Address;
+// use canopen_rs::sdo::{SdoClient, SdoEvent};
 use canopen_rs::transport::{cob_id, frame_from};
 use canopen_rs::types::NodeId;
 use canopen_rs::NmtCommand;
@@ -183,45 +183,45 @@ impl SocketCan {
         }
     }
 
-    /// Read object `addr` from `node`, interpreting the result as `data_type`.
-    ///
-    /// Runs the full SDO upload transaction (expedited or segmented) and
-    /// returns the value, or an [`SdoError`] on abort or I/O failure. Set a
-    /// read timeout first so an unresponsive node cannot block forever.
-    pub fn sdo_read(
-        &self,
-        node: NodeId,
-        addr: Address,
-        data_type: DataType,
-    ) -> Result<Value, SdoError> {
-        let mut client = SdoClient::new(node);
-        let mut request = client.read(addr, data_type);
-        loop {
-            self.send(client.request_cob_id(), &request)?;
-            let reply = self.recv_on(client.response_cob_id())?;
-            match client.on_response(reply.payload()) {
-                SdoEvent::Send(next) => request = next,
-                SdoEvent::Complete(value) => return value.ok_or(SdoError::NoValue),
-                SdoEvent::Aborted(code) => return Err(SdoError::Aborted(code)),
-            }
-        }
-    }
+    // /// Read object `addr` from `node`, interpreting the result as `data_type`.
+    // ///
+    // /// Runs the full SDO upload transaction (expedited or segmented) and
+    // /// returns the value, or an [`SdoError`] on abort or I/O failure. Set a
+    // /// read timeout first so an unresponsive node cannot block forever.
+    // pub fn sdo_read(
+    //     &self,
+    //     node: NodeId,
+    //     addr: Address,
+    //     data_type: DataType,
+    // ) -> Result<Value, SdoError> {
+    //     let mut client = SdoClient::new(node);
+    //     let mut request = client.read(addr, data_type);
+    //     loop {
+    //         self.send(client.request_cob_id(), &request)?;
+    //         let reply = self.recv_on(client.response_cob_id())?;
+    //         match client.on_response(reply.payload()) {
+    //             SdoEvent::Send(next) => request = next,
+    //             SdoEvent::Complete(value) => return value.ok_or(SdoError::NoValue),
+    //             SdoEvent::Aborted(code) => return Err(SdoError::Aborted(code)),
+    //         }
+    //     }
+    // }
 
-    /// Write `value` to object `addr` on `node`.
-    ///
-    /// Runs the full SDO download transaction (expedited or segmented),
-    /// choosing the transfer type from the value's size.
-    pub fn sdo_write(&self, node: NodeId, addr: Address, value: Value) -> Result<(), SdoError> {
-        let mut client = SdoClient::new(node);
-        let mut request = client.write(addr, value);
-        loop {
-            self.send(client.request_cob_id(), &request)?;
-            let reply = self.recv_on(client.response_cob_id())?;
-            match client.on_response(reply.payload()) {
-                SdoEvent::Send(next) => request = next,
-                SdoEvent::Complete(_) => return Ok(()),
-                SdoEvent::Aborted(code) => return Err(SdoError::Aborted(code)),
-            }
-        }
-    }
+    //     Write `value` to object `addr` on `node`.
+    //
+    //     Runs the full SDO download transaction (expedited or segmented),
+    //     choosing the transfer type from the value's size.
+    // pub fn sdo_write(&self, node: NodeId, addr: Address, value: Value) -> Result<(), SdoError> {
+    //     let mut client = SdoClient::new(node);
+    //     let mut request = client.write(addr, value);
+    //     loop {
+    //         self.send(client.request_cob_id(), &request)?;
+    //         let reply = self.recv_on(client.response_cob_id())?;
+    //         match client.on_response(reply.payload()) {
+    //             SdoEvent::Send(next) => request = next,
+    //             SdoEvent::Complete(_) => return Ok(()),
+    //             SdoEvent::Aborted(code) => return Err(SdoError::Aborted(code)),
+    //         }
+    //     }
+    // }
 }

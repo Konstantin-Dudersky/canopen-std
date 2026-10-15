@@ -3,7 +3,7 @@
 //! integration check that the codecs, server, and client compose into a
 //! working node for both expedited and segmented transfers.
 
-use canopen_rs::object_dictionary::Entry;
+use canopen_rs::object_dictionary1::Entry;
 use canopen_rs::sdo::{SdoClient, SdoEvent, SdoServer};
 use canopen_rs::{Address, ByteString, DataType, NodeId, ObjectDictionary, Value};
 

@@ -1,6 +1,6 @@
 //! Foundational CANopen types shared across the stack.
 
-use core::fmt;
+use core::{fmt, ops::Add};
 
 /// Result alias for fallible `canopen-rs` operations.
 pub type Result<T> = core::result::Result<T, Error>;
@@ -99,6 +99,15 @@ impl NodeId {
     /// The raw node id byte.
     pub const fn raw(self) -> u8 {
         self.0
+    }
+
+    pub fn checked_add(self, other: u8) -> Result<Self> {
+        let value = self
+            .0
+            .checked_add(other)
+            .filter(|&v| (1..=127).contains(&v))
+            .ok_or(Error::InvalidNodeId)?;
+        Ok(NodeId(value))
     }
 }
 

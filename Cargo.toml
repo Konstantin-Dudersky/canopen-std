@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["core", "host", "cli"]
+members = ["core", "host", "cli", "canopen-std"]
 
 [workspace.package]
 version = "0.6.1"
@@ -9,8 +9,8 @@ license = "MIT OR Apache-2.0"
 authors = ["Karpagam Karthikeyan"]
 repository = "https://github.com/KarpagamKarthikeyan/canopen-rs"
 rust-version = "1.75"
-keywords = ["canopen", "can", "cia301", "embedded", "no_std"]
-categories = ["embedded", "no-std", "network-programming"]
+keywords = ["canopen", "can", "cia301", "embedded"]
+categories = ["embedded", "network-programming"]
 
 [workspace.dependencies]
 # The no_std core, depended on by host crates.
@@ -20,10 +20,17 @@ canopen-rs = { path = "core", version = "0.6.1" }
 canopen-host = { path = "host", version = "0.6.1" }
 
 # Transport-agnostic CAN frame/id abstraction (no_std).
-embedded-can = "0.4"
+embedded-can = "0.4.1"
 
 # Bounded, allocation-free collections for the no_std object dictionary.
-heapless = "0.8"
+# DEPRECATED
+heapless = "0.8.0"
 
 # Linux SocketCAN transport (host only, Linux only).
-socketcan = "3.3"
+# DEPRECATED
+socketcan = { version = "3.3" }
+
+tokio = { version = "1.53.2", default-features = false, features = [ "sync" ,"time" ] }
+thiserror = { version = "2.0.21" }
+anyhow = { version = "1.0.104" }
+tracing = { version = "0.1.44" }

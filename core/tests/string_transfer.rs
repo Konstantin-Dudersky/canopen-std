@@ -8,7 +8,7 @@
 //! out-of-bounds panic it first surfaced are now fixed, and the corresponding
 //! tests assert the corrected behaviour.
 
-use canopen_rs::object_dictionary::Entry;
+use canopen_rs::object_dictionary1::Entry;
 use canopen_rs::sdo::{
     encode_download_expedited, encode_download_initiate_segmented, SdoClient, SdoEvent, SdoServer,
 };

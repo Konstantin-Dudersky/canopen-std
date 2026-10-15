@@ -1,4 +1,4 @@
-# canopen-rs
+# canopen-std
 
 [![CI](https://github.com/KarpagamKarthikeyan/canopen-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/KarpagamKarthikeyan/canopen-rs/actions/workflows/ci.yml)
 [![crates.io](https://img.shields.io/crates/v/canopen-rs.svg)](https://crates.io/crates/canopen-rs)

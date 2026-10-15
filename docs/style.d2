@@ -1,0 +1,24 @@
+# Общий стиль для диаграмм компонентов
+
+vars: {
+  d2-config: {
+    # layout-engine: tala
+    layout-engine: elk
+    theme-id: 200
+  }
+}
+
+# Пока не работает
+*.style.border-radius: 10
+
+classes: {
+    msgbus: {
+        shape: queue
+    }
+
+    buffer: {
+        style: {
+            stroke-dash: 5
+        }
+    }
+}
