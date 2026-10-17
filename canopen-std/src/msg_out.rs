@@ -1,4 +1,4 @@
-use crate::{core::nmt::NmtState, Value};
+use crate::{core::nmt::NmtState, types::Value};
 
 #[derive(Debug)]
 pub enum MsgOut {

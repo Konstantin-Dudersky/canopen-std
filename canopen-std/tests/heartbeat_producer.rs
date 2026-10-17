@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use canopen_std::{objects::ProducerHeartbeatTime, *};
+use canopen_std::{objects_old::ProducerHeartbeatTime, *};
 use embedded_can::Id;
 use tokio::sync::mpsc;
 

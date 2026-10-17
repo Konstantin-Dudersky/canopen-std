@@ -5,11 +5,11 @@ use tokio::sync::{mpsc, Mutex};
 
 use crate::{
     core::{
-        datatypes::Value,
         nmt::{NmtCommand, HEARTBEAT_COB_BASE, NMT_COMMAND_COB_ID},
         object_dictionary::ObjectDictionary,
         sync::{self, SYNC_COB_ID},
     },
+    types::Value,
     Error, MsgIn,
 };
 

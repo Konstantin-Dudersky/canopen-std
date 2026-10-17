@@ -1,10 +1,8 @@
-use bitvec::{
-    order::{Lsb0, Msb0},
-    view::BitView,
-};
+use bitvec::{order::Msb0, view::BitView};
 
 use crate::{
-    core::object_dictionary::ObjectDictionary, objects::RpdoMapping, Address, Entry, Error, Value,
+    core::object_dictionary::ObjectDictionary, objects_old::RpdoMapping, types::Value, Address,
+    Error,
 };
 
 /// Расшифровываем данные RPDO
@@ -49,8 +47,8 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     use crate::{
-        objects::{self, ObjectTrait},
-        AccessType, Address, Value,
+        objects_old::{self, ObjectTrait},
+        AccessType, Address, Entry,
     };
 
     use super::*;
@@ -63,15 +61,15 @@ mod tests {
 
         // Заполняем словарь объектов
         let entries = [
-            objects::RpdoMapping {
+            objects_old::RpdoMapping {
                 sequence_number: 0,
                 items: vec![
-                    objects::PdoMappingItem {
+                    objects_old::PdoMappingItem {
                         index: 0x2000,
                         subindex: 1,
                         length: 1,
                     },
-                    objects::PdoMappingItem {
+                    objects_old::PdoMappingItem {
                         index: 0x2000,
                         subindex: 2,
                         length: 8,

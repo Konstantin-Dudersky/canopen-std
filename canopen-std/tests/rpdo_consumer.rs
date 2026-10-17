@@ -5,8 +5,9 @@ mod common;
 use std::time::Duration;
 
 use canopen_std::{
-    objects::{self, ObjectTrait, PdoMappingItem, RpdoCommunication, RpdoTransmissionType},
-    AccessType, Address, CANopenNode, Entry, MsgIn, MsgOut, Value,
+    objects_old::{self, ObjectTrait, PdoMappingItem, RpdoCommunication, RpdoTransmissionType},
+    types::Value,
+    AccessType, Address, CANopenNode, Entry, MsgIn, MsgOut,
 };
 use common::{init_logging, recv_until};
 use embedded_can::StandardId;
@@ -28,7 +29,7 @@ async fn rpdo_consumer() {
         node_id,
         eds: "",
         entries: [
-            objects::RpdoCommunication {
+            objects_old::RpdoCommunication {
                 sequence_number: 0,
                 pdo_exist: true,
                 cob_id: RpdoCommunication::default_cob_id(0x17, 0).unwrap(),
@@ -37,7 +38,7 @@ async fn rpdo_consumer() {
                 event_timer: Duration::from_millis(0),
             }
             .entries(),
-            objects::RpdoMapping {
+            objects_old::RpdoMapping {
                 sequence_number: 0,
                 items: vec![
                     PdoMappingItem {

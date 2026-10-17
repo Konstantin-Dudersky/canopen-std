@@ -16,8 +16,11 @@ use super::{
     CCS_DOWNLOAD_SEGMENT, CCS_UPLOAD_INITIATE, CCS_UPLOAD_SEGMENT, CS_ABORT, CS_MASK, EXPEDITED,
     SEGMENT_DATA_MAX, SIZE_INDICATED, TOGGLE,
 };
-use crate::core::datatypes::{DataType, Value, MAX_STRING_LEN};
 use crate::Error;
+use crate::{
+    core::datatypes::MAX_STRING_LEN,
+    types::{DataType, Value},
+};
 use embedded_can::Id;
 
 /// An in-progress segmented transfer held between frames.

@@ -11,12 +11,12 @@ use tracing::error;
 
 use crate::{
     core::{
-        datatypes::Value,
         nmt::{NmtCommand, NmtStateMachine},
         object_dictionary::{Entry, ObjectDictionary},
     },
     eds::Eds,
     tasks::{self, StartupInfo},
+    types::Value,
     Error, MsgIn, MsgOut,
 };
 

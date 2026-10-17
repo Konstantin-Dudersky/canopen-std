@@ -3,10 +3,8 @@ use std::sync::Arc;
 use tokio::sync::{broadcast, mpsc, Mutex};
 
 use crate::{
-    core::{
-        datatypes::Value,
-        object_dictionary::{Address, ObjectDictionary},
-    },
+    core::object_dictionary::{Address, ObjectDictionary},
+    types::Value,
     Error,
 };
 

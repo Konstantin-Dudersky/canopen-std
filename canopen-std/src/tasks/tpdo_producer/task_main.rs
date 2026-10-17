@@ -4,7 +4,7 @@ use bitvec::{order::Msb0, view::BitView};
 use tokio::sync::{mpsc, Mutex, Notify};
 use tracing::trace;
 
-use crate::core::object_dictionary::objects::{
+use crate::core::object_dictionary::objects_old::{
     TpdoCommParameters, TpdoMapping, TpdoTransmissionType,
 };
 use crate::{

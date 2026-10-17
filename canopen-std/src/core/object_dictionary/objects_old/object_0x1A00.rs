@@ -40,7 +40,7 @@ impl ObjectDictionary {
 mod tests {
     use pretty_assertions::assert_eq;
 
-    use crate::Value;
+    use crate::types::Value;
 
     use super::*;
 

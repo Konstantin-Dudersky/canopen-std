@@ -40,10 +40,11 @@
 //! assert_eq!(&buf[..len], &[0xEF, 0xBE, 0x42]); // U16 little-endian, then U8
 //! ```
 
-use super::object_dictionary::{Address, ObjectDictionary};
-use crate::core::datatypes::Value;
-use crate::Error;
 use canopen_rs::types::NodeId;
+
+use crate::{types::Value, Error};
+
+use super::object_dictionary::{Address, ObjectDictionary};
 
 /// Whether a PDO transmits from, or receives into, the node.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -315,7 +316,6 @@ const fn byte_width(bit_length: u8) -> Result<usize, Error> {
 mod tests {
     use super::super::object_dictionary::Entry;
     use super::*;
-    use crate::core::datatypes::Value;
 
     // --- Default COB-IDs ---------------------------------------------------
     #[test]

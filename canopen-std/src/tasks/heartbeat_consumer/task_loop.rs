@@ -6,7 +6,7 @@ use tokio::{
 };
 
 use crate::{
-    core::{nmt::NmtCommand, object_dictionary::objects::object_0x1029::Object0x1029ErrorBehavior},
+    core::{nmt::NmtCommand, object_dictionary::objects_old::object_0x1029::Object0x1029ErrorBehavior},
     Error,
 };
 

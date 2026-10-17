@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use crate::{
     core::object_dictionary::{AccessType, Entry},
-    Value,
+    types::Value,
 };
 
 use super::{Address, Error, ObjectDictionary};

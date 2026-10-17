@@ -30,7 +30,7 @@ heapless = "0.8.0"
 # DEPRECATED
 socketcan = { version = "3.3" }
 
-tokio = { version = "1.53.2", default-features = false, features = [ "sync" ,"time" ] }
+tokio = { version = "1.53.2", default-features = false, features = [ "macros", "rt", "sync" ,"time" ] }
 thiserror = { version = "2.0.21" }
 anyhow = { version = "1.0.104" }
 tracing = { version = "0.1.44" }

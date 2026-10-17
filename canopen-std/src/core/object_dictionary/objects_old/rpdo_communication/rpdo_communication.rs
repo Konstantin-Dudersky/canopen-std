@@ -117,7 +117,7 @@ impl ObjectTrait for RpdoCommunication {
 
 #[cfg(test)]
 mod tests {
-    use crate::{objects::common::ObjectTrait, AccessType, Entry};
+    use crate::{objects_old::common::ObjectTrait, AccessType, Entry};
 
     use super::*;
 

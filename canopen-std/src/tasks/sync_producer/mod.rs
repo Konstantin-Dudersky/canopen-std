@@ -20,7 +20,7 @@ pub struct TaskSyncProducer {
 
 impl TaskSyncProducer {
     pub async fn run(self) -> Result<(), Error> {
-        let obj_0x1005 = self.od.lock().await.read_0x1005()?;
+        let obj_0x1005 = self.od.lock().await.read_sync_message_cob_id()?;
         // Выходим, если генерация SYNC сообщений отключена
         if !obj_0x1005.device_generate_sync {
             return Ok(());

@@ -3,7 +3,9 @@ mod core;
 mod error;
 mod msg_in;
 mod msg_out;
+pub mod objects;
 mod tasks;
+pub mod types;
 
 /// Electronic Data Sheet (EDS) / Device Configuration File (DCF) parsing.
 ///
@@ -12,9 +14,8 @@ mod eds;
 
 pub use {
     canopen_node::CANopenNode,
-    core::datatypes::{DataType, Value},
     core::nmt::NmtCommand,
-    core::object_dictionary::objects,
+    core::object_dictionary::objects_old,
     core::object_dictionary::{AccessType, Address, Entry},
     error::Error,
     msg_in::MsgIn,

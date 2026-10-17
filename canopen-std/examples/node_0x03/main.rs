@@ -25,7 +25,7 @@ async fn main() {
         output: tx_from_canopen,
         node_id: 0x03,
         eds: include_str!("./EK-IO-DQ-v0.2.0.eds"),
-        entries: [objects::ProducerHeartbeatTime {
+        entries: [objects_old::ProducerHeartbeatTime {
             heartbeat_time: Duration::from_millis(500),
             heartbeat_time_access: AccessType::Rw,
         }

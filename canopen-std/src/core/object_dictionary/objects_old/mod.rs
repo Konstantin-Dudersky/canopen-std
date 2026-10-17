@@ -1,7 +1,6 @@
 #![allow(clippy::module_inception)]
 
 mod common;
-pub mod object_0x1005;
 pub mod object_0x1006;
 pub mod object_0x1016;
 pub mod object_0x1019;
@@ -12,6 +11,7 @@ pub mod object_0x1A00;
 mod producer_heartbeat_time;
 mod rpdo_communication;
 mod rpdo_mapping;
+mod sync_message_cob_id;
 
 pub use {
     common::{ObjectTrait, PdoMappingItem},

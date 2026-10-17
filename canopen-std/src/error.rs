@@ -1,4 +1,4 @@
-use crate::core::datatypes::Value;
+use crate::types::Value;
 
 #[allow(missing_docs)]
 #[derive(Debug, thiserror::Error)]

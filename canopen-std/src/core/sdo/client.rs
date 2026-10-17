@@ -32,8 +32,10 @@ use super::{
     encode_data_segment, encode_download_expedited, encode_download_initiate_segmented,
     encode_upload_request, encode_upload_segment_request, SdoPayload, SEGMENT_DATA_MAX,
 };
-use crate::core::datatypes::{DataType, Value, MAX_STRING_LEN};
-use canopen_rs::types::NodeId;
+use crate::{
+    core::datatypes::MAX_STRING_LEN,
+    types::{DataType, Value},
+};
 use embedded_can::Id;
 
 /// The abort code for "toggle bit not alternated" (CiA 301 §7.2.4.3.17), used

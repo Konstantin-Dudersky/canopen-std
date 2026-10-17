@@ -37,7 +37,7 @@
 
 use super::object_dictionary::Address;
 use crate::{
-    core::datatypes::{DataType, Value},
+    types::{DataType, Value},
     Error,
 };
 

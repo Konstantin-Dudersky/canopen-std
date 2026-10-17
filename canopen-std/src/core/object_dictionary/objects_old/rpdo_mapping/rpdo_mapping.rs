@@ -1,4 +1,4 @@
-use crate::{AccessType, Entry, Value};
+use crate::{types::Value, AccessType, Entry};
 
 use super::super::{
     common::{ObjectTrait, PdoMappingItem},

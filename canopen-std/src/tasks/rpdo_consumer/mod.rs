@@ -11,7 +11,7 @@ use tokio::{
     task::JoinSet,
 };
 
-use crate::{core::object_dictionary::ObjectDictionary, Error, MsgOut, Value};
+use crate::{core::object_dictionary::ObjectDictionary, Error, MsgOut};
 
 use super::{startup_info::id_to_string, StartupInfo};
 use int_msg::IntMsg;
@@ -26,7 +26,7 @@ pub struct TaskRpdoConsumer {
 }
 
 impl TaskRpdoConsumer {
-    pub async fn run(mut self) -> Result<(), Error> {
+    pub async fn run(self) -> Result<(), Error> {
         let mut info: HashMap<String, String> = HashMap::new();
 
         let config = self
@@ -40,7 +40,7 @@ impl TaskRpdoConsumer {
             config.transmission_type.to_string(),
         );
 
-        let mapping = self
+        let _mapping = self
             .od
             .lock()
             .await

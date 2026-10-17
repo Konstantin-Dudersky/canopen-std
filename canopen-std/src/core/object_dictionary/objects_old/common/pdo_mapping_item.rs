@@ -1,6 +1,6 @@
 use bitvec::{field::BitField, order::Lsb0, view::BitView};
 
-use crate::{Error, Value};
+use crate::{types::Value, Error};
 
 #[derive(Debug)]
 pub struct PdoMappingItem {

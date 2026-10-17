@@ -28,13 +28,12 @@
 
 mod access_type;
 mod address;
-pub mod objects;
+pub mod objects_old;
 pub use {access_type::AccessType, address::Address};
 
 use {canopen_rs::NodeId, std::collections::HashMap};
 
-use crate::core::datatypes::Value;
-use crate::Error;
+use crate::{types::Value, Error};
 
 /// A single object dictionary entry: a typed value and its access rights.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -166,7 +165,6 @@ impl ObjectDictionary {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::datatypes::Value;
 
     fn od() -> ObjectDictionary {
         let mut od = ObjectDictionary::new(NodeId::new(1).unwrap());

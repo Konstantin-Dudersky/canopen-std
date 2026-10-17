@@ -1,4 +1,5 @@
-use crate::core::{datatypes::Value, nmt::NmtCommand};
+use crate::core::nmt::NmtCommand;
+use crate::types::Value;
 
 #[derive(Debug)]
 pub enum MsgIn {

@@ -6,7 +6,7 @@ pub use {object_trait::ObjectTrait, pdo_mapping_item::PdoMappingItem};
 use bitvec::{field::BitField, order::Lsb0, view::BitView};
 use embedded_can::{ExtendedId, Id, StandardId};
 
-use crate::{Error, Value};
+use crate::{types::Value, Error};
 
 /// Декодировать COB ID из словаря.
 ///

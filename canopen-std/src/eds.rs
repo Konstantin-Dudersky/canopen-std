@@ -30,8 +30,9 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
-use crate::core::datatypes::{ByteString, DataType, Value, MAX_STRING_LEN};
+use crate::core::datatypes::{ByteString, MAX_STRING_LEN};
 use crate::core::object_dictionary::{AccessType, Address, Entry, ObjectDictionary};
+use crate::types::{DataType, Value};
 use canopen_rs::NodeId;
 
 /// An error encountered while parsing an EDS/DCF file.
