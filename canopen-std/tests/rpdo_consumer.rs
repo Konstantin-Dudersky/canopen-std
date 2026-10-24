@@ -5,9 +5,10 @@ mod common;
 use std::time::Duration;
 
 use canopen_std::{
-    objects_old::{self, ObjectTrait, PdoMappingItem, RpdoCommunication, RpdoTransmissionType},
-    types::Value,
-    AccessType, Address, CANopenNode, Entry, MsgIn, MsgOut,
+    objects,
+    objects_old::PdoMappingItem,
+    types::{AccessType, EntryRecord, ObjectRecord, Value},
+    CANopenNode, MsgIn, MsgOut,
 };
 use common::{init_logging, recv_until};
 use embedded_can::StandardId;
@@ -28,17 +29,17 @@ async fn rpdo_consumer() {
         output: tx_from_canopen,
         node_id,
         eds: "",
-        entries: [
-            objects_old::RpdoCommunication {
+        objects: vec![
+            objects::RpdoCommunication {
                 sequence_number: 0,
                 pdo_exist: true,
-                cob_id: RpdoCommunication::default_cob_id(0x17, 0).unwrap(),
-                transmission_type: RpdoTransmissionType::EventDrivenManufacturer,
+                cob_id: objects::RpdoCommunication::default_cob_id(0x17, 0).unwrap(),
+                transmission_type: objects::RpdoTransmissionType::EventDrivenManufacturer,
                 inhibit_time: Duration::from_millis(0),
                 event_timer: Duration::from_millis(0),
             }
-            .entries(),
-            objects_old::RpdoMapping {
+            .into(),
+            objects::RpdoMapping {
                 sequence_number: 0,
                 items: vec![
                     PdoMappingItem {
@@ -53,21 +54,29 @@ async fn rpdo_consumer() {
                     },
                 ],
             }
-            .entries(),
-            vec![
-                Entry {
-                    address: Address::new(0x2000, 1),
-                    value: Value::Unsigned8(0),
-                    access: AccessType::Ro,
-                },
-                Entry {
-                    address: Address::new(0x2000, 2),
-                    value: Value::Unsigned8(0),
-                    access: AccessType::Ro,
-                },
-            ],
-        ]
-        .concat(),
+            .into(),
+            ObjectRecord {
+                index: 0x2000,
+                name: "Test".into(),
+                entries: vec![
+                    EntryRecord {
+                        subindex: 1,
+                        description: "Test".into(),
+                        access_type: AccessType::Ro,
+                        pdo_mapping: false,
+                        value: Value::Unsigned8(0),
+                    },
+                    EntryRecord {
+                        subindex: 2,
+                        description: "Test".into(),
+                        access_type: AccessType::Ro,
+                        pdo_mapping: false,
+                        value: Value::Unsigned8(0),
+                    },
+                ],
+            }
+            .into(),
+        ],
     };
 
     let node_handle = tokio::spawn(node.run());

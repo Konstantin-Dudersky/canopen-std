@@ -4,13 +4,8 @@ use bitvec::{order::Msb0, view::BitView};
 use tokio::sync::{mpsc, Mutex, Notify};
 use tracing::trace;
 
-use crate::core::object_dictionary::objects_old::{
-    TpdoCommParameters, TpdoMapping, TpdoTransmissionType,
-};
-use crate::{
-    core::object_dictionary::{Address, ObjectDictionary},
-    Error, MsgOut,
-};
+use crate::objects::{ObjectDictionary, TpdoCommunication, TpdoMapping, TpdoTransmissionType};
+use crate::{Error, MsgOut};
 
 use super::int_msg::IntMsg;
 
@@ -18,7 +13,7 @@ pub struct TaskMain {
     pub input: mpsc::Receiver<IntMsg>,
     pub output: mpsc::Sender<MsgOut>,
     pub od: Arc<Mutex<ObjectDictionary>>,
-    pub config: TpdoCommParameters,
+    pub config: TpdoCommunication,
     pub mapping: TpdoMapping,
     pub timer_reset: Arc<Notify>,
 }
@@ -208,8 +203,7 @@ fn pack_tpdo(mapping: &TpdoMapping, od: &ObjectDictionary) -> Result<Vec<u8>, Er
     let mut offset = 0;
     for item in &mapping.items {
         let width = item.length as usize;
-        let addr = Address::new(item.index, item.subindex);
-        let value = od.read(addr)?;
+        let value = od.read(item.index, item.subindex)?;
         if value.data_type().is_variable() || value.bit_size() != width {
             return Err(Error::TypeMismatch);
         }

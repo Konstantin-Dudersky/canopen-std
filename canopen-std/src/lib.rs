@@ -14,9 +14,11 @@ mod eds;
 
 pub use {
     canopen_node::CANopenNode,
+    canopen_rs::NodeId,
     core::nmt::NmtCommand,
     core::object_dictionary::objects_old,
-    core::object_dictionary::{AccessType, Address, Entry},
+    core::object_dictionary::{Address, Entry},
+    core::sdo,
     error::Error,
     msg_in::MsgIn,
     msg_out::MsgOut,

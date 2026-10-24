@@ -1,19 +1,17 @@
-use super::{DataType, EntryRecord, Object};
+use super::{EntryRecord, Object};
 
 pub struct ObjectRecord {
     pub index: u16,
     pub name: String,
-    pub data_type: DataType,
     pub entries: Vec<EntryRecord>,
 }
 
 impl From<ObjectRecord> for Object {
-    fn from(value: ObjectRecord) -> Self {
+    fn from(v: ObjectRecord) -> Self {
         Self::Record {
-            index: value.index,
-            name: value.name,
-            data_type: value.data_type,
-            entries: value.entries.into_iter().map(|e| e.into()).collect(),
+            index: v.index,
+            name: v.name,
+            entries: v.entries.into_iter().map(|entry| entry.into()).collect(),
         }
     }
 }

@@ -10,13 +10,11 @@ use tokio::{
 use tracing::error;
 
 use crate::{
-    core::{
-        nmt::{NmtCommand, NmtStateMachine},
-        object_dictionary::{Entry, ObjectDictionary},
-    },
+    core::nmt::{NmtCommand, NmtStateMachine},
     eds::Eds,
+    objects::ObjectDictionary,
     tasks::{self, StartupInfo},
-    types::Value,
+    types::{Object, Value},
     Error, MsgIn, MsgOut,
 };
 
@@ -33,19 +31,21 @@ pub struct CANopenNode {
     /// Содержимое EDS-файла
     pub eds: &'static str,
 
-    pub entries: Vec<Entry>,
+    pub objects: Vec<Object>,
 }
 
 impl CANopenNode {
     pub async fn run(mut self) {
         let node_id = NodeId::new(self.node_id).unwrap();
-        let eds = Eds::parse(self.eds, node_id).unwrap();
-        let mut od = eds.object_dictionary(node_id).unwrap();
-        self.add_entries(&mut od).unwrap();
 
         let nmt_state = NmtStateMachine::new();
         let nmt_state = Arc::new(Mutex::new(nmt_state));
 
+        let mut od = Eds::parse(self.eds, node_id)
+            .unwrap()
+            .object_dictionary(node_id)
+            .unwrap();
+        self.add_entries(&mut od).unwrap();
         let od = Arc::new(Mutex::new(od));
 
         let startup_info = tasks::StartupInfo::new();
@@ -182,8 +182,8 @@ impl CANopenNode {
     }
 
     fn add_entries(&mut self, od: &mut ObjectDictionary) -> Result<(), Error> {
-        for entry in self.entries.iter() {
-            od.insert(entry.address, *entry)?;
+        for entry in self.objects.iter() {
+            od.insert_object(entry.clone());
         }
         Ok(())
     }
@@ -200,7 +200,11 @@ async fn spawn_tpdo_producer(
     let mut count = 0;
 
     for tpdo_index in 0..4 {
-        let pdo_exist = od.lock().await.read_0x1800(tpdo_index)?.pdo_exist;
+        let pdo_exist = od
+            .lock()
+            .await
+            .read_tpdo_communication(tpdo_index)?
+            .pdo_exist;
         if !pdo_exist {
             break;
         }

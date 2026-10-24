@@ -1,7 +1,6 @@
-mod object_trait;
 mod pdo_mapping_item;
 
-pub use {object_trait::ObjectTrait, pdo_mapping_item::PdoMappingItem};
+pub use pdo_mapping_item::PdoMappingItem;
 
 use bitvec::{field::BitField, order::Lsb0, view::BitView};
 use embedded_can::{ExtendedId, Id, StandardId};

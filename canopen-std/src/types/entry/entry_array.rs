@@ -1,6 +1,8 @@
-use super::{AccessType, Entry};
+use super::{AccessType, Entry, Value};
 
 pub struct EntryArray {
+    pub subindex: u8,
+
     /// Descriptive name of the sub-index
     pub description: String,
 
@@ -8,17 +10,17 @@ pub struct EntryArray {
 
     pub pdo_mapping: bool,
 
-    pub default_value: String,
+    pub value: Value,
 }
 
 impl From<EntryArray> for Entry {
     fn from(value: EntryArray) -> Self {
         Self {
+            subindex: value.subindex,
             description: Some(value.description),
-            data_type: None,
             access_type: value.access_type,
             pdo_mapping: value.pdo_mapping,
-            value: value.default_value,
+            value: value.value,
         }
     }
 }

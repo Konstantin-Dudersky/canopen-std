@@ -6,4 +6,4 @@ mod entry_record;
 
 pub use {entry::Entry, entry_array::EntryArray, entry_record::EntryRecord};
 
-use super::{AccessType, DataType, Value};
+use super::{AccessType, Value};

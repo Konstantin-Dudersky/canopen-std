@@ -11,7 +11,7 @@ use tokio::{
     task::JoinSet,
 };
 
-use crate::{core::object_dictionary::ObjectDictionary, Error, MsgOut};
+use crate::{objects::ObjectDictionary, Error, MsgOut};
 
 use super::{startup_info::id_to_string, StartupInfo};
 use int_msg::IntMsg;

@@ -5,15 +5,12 @@ use tokio::{
     time::sleep,
 };
 
-use crate::{
-    core::{nmt::NmtCommand, object_dictionary::objects_old::object_0x1029::Object0x1029ErrorBehavior},
-    Error,
-};
+use crate::{core::nmt::NmtCommand, objects::ErrorBehaviorAction, Error};
 
 use super::HeartbeatConsumerState;
 
 pub struct TaskLoop {
-    pub error_behavior: Object0x1029ErrorBehavior,
+    pub error_behavior: ErrorBehaviorAction,
     pub output_nmt_slave: mpsc::Sender<NmtCommand>,
     pub heartbeat_consumer_state: Arc<Mutex<HeartbeatConsumerState>>,
 }
@@ -25,12 +22,12 @@ impl TaskLoop {
 
             if timeout_occured {
                 match self.error_behavior {
-                    Object0x1029ErrorBehavior::EnterPreOperational => {
+                    ErrorBehaviorAction::EnterPreOperational => {
                         let cmd = NmtCommand::EnterPreOperational;
                         self.output_nmt_slave.send(cmd).await.unwrap();
                     }
-                    Object0x1029ErrorBehavior::NoChange => (),
-                    Object0x1029ErrorBehavior::Stop => {
+                    ErrorBehaviorAction::NoChange => (),
+                    ErrorBehaviorAction::Stop => {
                         let cmd = NmtCommand::StopRemoteNode;
                         self.output_nmt_slave.send(cmd).await.unwrap();
                     }

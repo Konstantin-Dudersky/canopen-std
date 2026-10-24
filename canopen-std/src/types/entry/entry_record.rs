@@ -1,27 +1,26 @@
-use super::{AccessType, DataType, Entry};
+use super::{AccessType, Entry, Value};
 
 pub struct EntryRecord {
+    pub subindex: u8,
+
     /// Descriptive name of the sub-index
     pub description: String,
-
-    /// Data type classification
-    pub data_type: DataType,
 
     pub access_type: AccessType,
 
     pub pdo_mapping: bool,
 
-    pub default_value: String,
+    pub value: Value,
 }
 
 impl From<EntryRecord> for Entry {
     fn from(value: EntryRecord) -> Self {
         Self {
+            subindex: value.subindex,
             description: Some(value.description),
-            data_type: Some(value.data_type),
             access_type: value.access_type,
             pdo_mapping: value.pdo_mapping,
-            value: value.default_value,
+            value: value.value,
         }
     }
 }

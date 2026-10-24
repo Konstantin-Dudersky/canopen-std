@@ -1,7 +1,8 @@
 use bitvec::{order::Msb0, view::BitView};
 
 use crate::{
-    core::object_dictionary::ObjectDictionary, objects_old::RpdoMapping, types::Value, Address,
+    objects::{ObjectDictionary, RpdoMapping},
+    types::Value,
     Error,
 };
 
@@ -10,7 +11,7 @@ fn decode_rpdo(
     rpdo_maping: RpdoMapping,
     rpdo_data: &[u8],
     od: &ObjectDictionary,
-) -> Result<Vec<(Address, Value)>, Error> {
+) -> Result<Vec<(u16, u8, Value)>, Error> {
     if rpdo_data.len() * 8 < rpdo_maping.bit_size() {
         return Err(Error::BadLength);
     }
@@ -21,8 +22,7 @@ fn decode_rpdo(
     let mut values = vec![];
 
     for map in rpdo_maping.items {
-        let address = Address::new(map.index, map.subindex);
-        let od_entry = od.entry(address).unwrap();
+        let od_entry = od.get_entry(map.index, map.subindex).unwrap();
 
         let od_size = od_entry.value.data_type().bit_size();
         let rpdo_size = map.length as usize;
@@ -34,7 +34,7 @@ fn decode_rpdo(
         let value = Value::decode(od_entry.value.data_type(), bit_slice)?;
         start_bit += od_size;
 
-        values.push((address, value));
+        values.push((map.index, map.subindex, value));
     }
 
     Ok(values)
@@ -47,8 +47,8 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     use crate::{
-        objects_old::{self, ObjectTrait},
-        AccessType, Address, Entry,
+        objects_old::{self},
+        types::{AccessType, EntryRecord, Object, ObjectRecord},
     };
 
     use super::*;
@@ -60,8 +60,8 @@ mod tests {
         let mut od = ObjectDictionary::new(node);
 
         // Заполняем словарь объектов
-        let entries = [
-            objects_old::RpdoMapping {
+        let objects: Vec<Object> = vec![
+            RpdoMapping {
                 sequence_number: 0,
                 items: vec![
                     objects_old::PdoMappingItem {
@@ -76,23 +76,31 @@ mod tests {
                     },
                 ],
             }
-            .entries(),
-            vec![
-                Entry {
-                    address: Address::new(0x2000, 1),
-                    value: Value::Boolean(false),
-                    access: AccessType::Rw,
-                },
-                Entry {
-                    address: Address::new(0x2000, 2),
-                    value: Value::Unsigned8(0),
-                    access: AccessType::Rw,
-                },
-            ],
-        ]
-        .concat();
-        for entry in entries {
-            od.insert(entry.address, entry).unwrap();
+            .into(),
+            ObjectRecord {
+                index: 0x2000,
+                name: "Test".to_string(),
+                entries: vec![
+                    EntryRecord {
+                        subindex: 1,
+                        description: "".to_string(),
+                        access_type: AccessType::Rw,
+                        pdo_mapping: false,
+                        value: Value::Boolean(false),
+                    },
+                    EntryRecord {
+                        subindex: 2,
+                        description: "".to_string(),
+                        access_type: AccessType::Rw,
+                        pdo_mapping: false,
+                        value: Value::Unsigned8(0),
+                    },
+                ],
+            }
+            .into(),
+        ];
+        for entry in objects {
+            od.insert_object(entry);
         }
 
         let rpdo_mapping = od.read_rpdo_mapping(0).unwrap();
@@ -100,8 +108,8 @@ mod tests {
         let left = decode_rpdo(rpdo_mapping, &rpdo_data, &od).unwrap();
 
         let right = vec![
-            (Address::new(0x2000, 1), Value::Boolean(true)),
-            (Address::new(0x2000, 2), Value::Unsigned8(0x17)),
+            (0x2000, 1, Value::Boolean(true)),
+            (0x2000, 2, Value::Unsigned8(0x17)),
         ];
 
         assert_eq!(left, right);

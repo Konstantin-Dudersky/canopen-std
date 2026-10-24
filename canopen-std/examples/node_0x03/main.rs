@@ -1,6 +1,9 @@
 use std::time::Duration;
 
-use canopen_std::*;
+use canopen_std::{
+    types::{AccessType, Value},
+    *,
+};
 use tokio::{sync::mpsc, task::JoinSet, time::sleep};
 use tracing::warn;
 
@@ -24,13 +27,15 @@ async fn main() {
         input: rx_to_canopen,
         output: tx_from_canopen,
         node_id: 0x03,
-        eds: include_str!("./EK-IO-DQ-v0.2.0.eds"),
-        entries: [objects_old::ProducerHeartbeatTime {
-            heartbeat_time: Duration::from_millis(500),
-            heartbeat_time_access: AccessType::Rw,
-        }
-        .entries()]
-        .concat(),
+        eds: include_str!(
+            "/home/konstantin/projects/plc-modules/firmware/ek_modules_eds_dbc/EDS/EK-IO-DQ-v0.2.0.eds"
+        ),
+        objects: vec![
+            objects::ProducerHeartbeatTime {
+                heartbeat_time: Duration::from_millis(500),
+            }
+            .into(),
+        ],
     };
 
     task_set.spawn(node.run());

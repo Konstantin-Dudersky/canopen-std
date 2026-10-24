@@ -2,11 +2,7 @@ use std::sync::Arc;
 
 use tokio::sync::{broadcast, mpsc, Mutex};
 
-use crate::{
-    core::object_dictionary::{Address, ObjectDictionary},
-    types::Value,
-    Error,
-};
+use crate::{objects::ObjectDictionary, types::Value, Error};
 
 pub struct TaskOdChange {
     pub input: mpsc::Receiver<(u16, u8, Value)>,
@@ -17,11 +13,9 @@ pub struct TaskOdChange {
 impl TaskOdChange {
     pub async fn run(mut self) -> Result<(), Error> {
         while let Some((index, subindex, value)) = self.input.recv().await {
-            let address = Address::new(index, subindex);
-
             {
                 let mut od = self.od.lock().await;
-                od.set(address, value)?;
+                od.set(index, subindex, value)?;
             }
 
             self.output.send(()).unwrap();

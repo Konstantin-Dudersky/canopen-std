@@ -35,6 +35,9 @@
 //! assert_eq!(frame, [0x23, 0x00, 0x20, 0x00, 0x78, 0x56, 0x34, 0x12]);
 //! ```
 
+use canopen_rs::NodeId;
+use embedded_can::{Id, StandardId};
+
 use super::object_dictionary::Address;
 use crate::{
     types::{DataType, Value},
@@ -45,7 +48,7 @@ pub mod block;
 pub mod client;
 pub mod server;
 
-pub use server::SdoServer;
+pub use {client::SdoClient, server::SdoServer};
 
 /// The 8-byte SDO payload carried in a CAN frame's data field.
 pub type SdoPayload = [u8; 8];
@@ -74,6 +77,12 @@ const NO_MORE_SEGMENTS: u8 = 0x01; // 'c' in a data-segment frame (last segment)
 
 /// Maximum data bytes carried by a single SDO segment frame.
 pub const SEGMENT_DATA_MAX: usize = 7;
+
+/// COB-ID base for SDO client → server (request) frames: `0x600 + node id`.
+pub const SDO_REQUEST_COB_BASE: u16 = 0x600;
+
+/// COB-ID base for SDO server → client (response) frames: `0x580 + node id`.
+pub const SDO_RESPONSE_COB_BASE: u16 = 0x580;
 
 /// SDO abort codes (CiA 301 §7.2.4.3.17). The value is the 32-bit code sent
 /// little-endian in bytes 4..8 of an abort frame.
@@ -467,6 +476,20 @@ impl<const N: usize> SegmentReader<N> {
         }
         Ok(())
     }
+}
+
+pub fn default_cob_id_client_to_server(node_id: NodeId) -> Result<Id, Error> {
+    let id =
+        StandardId::new(node_id.raw() as u16 + SDO_REQUEST_COB_BASE).ok_or(Error::InvalidCobId)?;
+
+    Ok(id.into())
+}
+
+pub fn default_cob_id_server_to_client(node_id: NodeId) -> Result<Id, Error> {
+    let id =
+        StandardId::new(node_id.raw() as u16 + SDO_RESPONSE_COB_BASE).ok_or(Error::InvalidCobId)?;
+
+    Ok(id.into())
 }
 
 #[cfg(test)]

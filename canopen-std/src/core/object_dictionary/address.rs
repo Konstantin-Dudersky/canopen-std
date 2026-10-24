@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 /// The address of an object dictionary entry: a 16-bit index and 8-bit
 /// subindex.
 ///
@@ -15,5 +17,11 @@ impl Address {
     /// Construct an address from an index and subindex.
     pub const fn new(index: u16, subindex: u8) -> Self {
         Self { index, subindex }
+    }
+}
+
+impl Display for Address {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:04X}:{}", self.index, self.subindex)
     }
 }

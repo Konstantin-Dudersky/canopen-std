@@ -5,8 +5,8 @@ use crate::types::Value;
 pub enum Error {
     // #[error("Convert output can frame failed")]
     // ConvertOutputCanFrame(crate::core::node::TxFrame),
-    #[error("Error from canopen_rs EdsError: {0}")]
-    CanopenEdserror(#[from] crate::eds::EdsError),
+    #[error("Error opening EDS file: {0}")]
+    Edserror(#[from] crate::eds::EdsError),
 
     #[error("Error from canopen_rs: {0}")]
     CanopenRs(#[from] canopen_rs::Error),
@@ -40,6 +40,11 @@ pub enum Error {
     /// No object exists at the requested (index, subindex).
     #[error("Object not found")]
     ObjectNotFound,
+
+    /// No entry exists at the requested (index, subindex).
+    #[error("Entry not found. Index: {index}, subindex: {subindex}")]
+    EntryNotFound { index: u16, subindex: u8 },
+
     /// A node id outside the valid `1..=127` range was supplied.
     #[error("Invalid node id")]
     InvalidNodeId,

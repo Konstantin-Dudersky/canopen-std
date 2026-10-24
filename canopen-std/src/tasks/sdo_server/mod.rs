@@ -5,7 +5,8 @@ use tokio::sync::{mpsc, Mutex};
 use tracing::warn;
 
 use crate::{
-    core::{nmt::NmtStateMachine, object_dictionary::ObjectDictionary, sdo::server::SdoServer},
+    core::{nmt::NmtStateMachine, sdo::server::SdoServer},
+    objects::ObjectDictionary,
     Error, MsgOut,
 };
 
@@ -25,14 +26,14 @@ impl TaskSdoServer {
             .od
             .lock()
             .await
-            .read_object_0x1200()?
+            .read_sdo_server()?
             .cob_id_client_to_server;
 
         let response_cob_id = self
             .od
             .lock()
             .await
-            .read_object_0x1200()?
+            .read_sdo_server()?
             .cob_id_server_to_client;
 
         let startup_info: HashMap<String, String> = HashMap::from_iter([

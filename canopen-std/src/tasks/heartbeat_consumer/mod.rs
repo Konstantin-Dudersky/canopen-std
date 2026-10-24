@@ -9,12 +9,12 @@ use std::{
 use canopen_rs::NodeId;
 use embedded_can::Id;
 use tokio::{
-    sync::{mpsc, Mutex},
+    sync::{Mutex, mpsc},
     task::JoinSet,
 };
 use tracing::warn;
 
-use crate::core::{nmt::NmtCommand, object_dictionary::ObjectDictionary};
+use crate::{core::nmt::NmtCommand, objects::ObjectDictionary};
 
 pub struct TaskHeartbeatConsumer {
     pub input: mpsc::Receiver<Id>,
@@ -24,13 +24,13 @@ pub struct TaskHeartbeatConsumer {
 
 impl TaskHeartbeatConsumer {
     pub async fn run(self) -> Result<(), crate::Error> {
-        let obj0x1016 = self.od.lock().await.read_object_0x1016().unwrap();
+        let obj0x1016 = self.od.lock().await.read_consumer_heartbeat_time().unwrap();
 
         let error_behavior = self
             .od
             .lock()
             .await
-            .read_object_0x1029()
+            .read_error_behavior()
             .unwrap()
             .communication_error;
 

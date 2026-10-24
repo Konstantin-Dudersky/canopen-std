@@ -8,7 +8,7 @@
 //! five to eight bytes, such as `UNSIGNED64` — across multiple frames, holding
 //! the per-transfer state between calls.
 
-use super::super::object_dictionary::{Address, ObjectDictionary};
+use super::super::object_dictionary::Address;
 use super::{
     decode_data_segment, decode_download_initiate_segmented, encode_abort, encode_data_segment,
     encode_download_response, encode_download_segment_response, encode_upload_expedited_response,
@@ -16,10 +16,10 @@ use super::{
     CCS_DOWNLOAD_SEGMENT, CCS_UPLOAD_INITIATE, CCS_UPLOAD_SEGMENT, CS_ABORT, CS_MASK, EXPEDITED,
     SEGMENT_DATA_MAX, SIZE_INDICATED, TOGGLE,
 };
-use crate::Error;
 use crate::{
-    core::datatypes::MAX_STRING_LEN,
-    types::{DataType, Value},
+    objects::ObjectDictionary,
+    types::{DataType, Value, MAX_STRING_LEN},
+    Error,
 };
 use embedded_can::Id;
 
@@ -122,8 +122,8 @@ impl SdoServer {
         req: &SdoPayload,
     ) -> Option<SdoPayload> {
         let addr = req_address(req);
-        let (data_type, writable) = match od.entry(addr) {
-            Some(e) => (e.value.data_type(), e.access.is_writable()),
+        let (data_type, writable) = match od.get_entry(addr.index, addr.subindex) {
+            Some(e) => (e.value.data_type(), e.access_type.is_writable()),
             None => return abort(addr, SdoAbortCode::ObjectDoesNotExist),
         };
         if !writable {
@@ -187,7 +187,7 @@ impl SdoServer {
         req: &SdoPayload,
     ) -> Option<SdoPayload> {
         let addr = req_address(req);
-        let value = match od.read(addr) {
+        let value = match od.read(addr.index, addr.subindex) {
             Ok(v) => v,
             Err(Error::ObjectNotFound) => return abort(addr, SdoAbortCode::ObjectDoesNotExist),
             Err(Error::WriteOnly) => return abort(addr, SdoAbortCode::ReadOfWriteOnly),
@@ -276,7 +276,7 @@ impl SdoServer {
                     };
                     // The final segment is acknowledged with a segment
                     // response, not a download-initiate response.
-                    match od.write(addr, value) {
+                    match od.write(addr.index, addr.subindex, value) {
                         Ok(()) => {
                             self.last_write = Some(addr);
                             Some(ack)
@@ -308,7 +308,7 @@ fn write_value(
     value: Value,
     last_write: &mut Option<Address>,
 ) -> Option<SdoPayload> {
-    match od.write(addr, value) {
+    match od.write(addr.index, addr.subindex, value) {
         Ok(()) => {
             *last_write = Some(addr);
             Some(encode_download_response(addr))
@@ -330,7 +330,8 @@ fn abort(addr: Address, code: SdoAbortCode) -> Option<SdoPayload> {
 #[cfg(test)]
 mod tests {
 
-    use super::super::super::object_dictionary::Entry;
+    use crate::types::{AccessType, ObjectVar};
+
     use super::*;
     use canopen_rs::NodeId;
     use embedded_can::StandardId;
@@ -343,15 +344,28 @@ mod tests {
 
     fn od() -> ObjectDictionary {
         let mut od = ObjectDictionary::new(NodeId::new(1).unwrap());
-        od.insert(
-            Address::new(0x1000, 0),
-            Entry::constant(Value::Unsigned32(0x0000_0192)),
-        )
-        .unwrap();
-        od.insert(Address::new(0x1017, 0), Entry::rw(Value::Unsigned16(1000)))
-            .unwrap();
-        od.insert(Address::new(0x2000, 0), Entry::rw(Value::Unsigned64(0)))
-            .unwrap();
+        od.insert_object(ObjectVar {
+            index: 0x1000,
+            name: "".into(),
+            access_type: AccessType::Const,
+            pdo_mapping: false,
+            value: Value::Unsigned32(0x0000_0192),
+        });
+        od.insert_object(ObjectVar {
+            index: 0x1017,
+            name: "".into(),
+            access_type: AccessType::Rw,
+            pdo_mapping: false,
+            value: Value::Unsigned16(1000),
+        });
+
+        od.insert_object(ObjectVar {
+            index: 0x2000,
+            name: "".into(),
+            access_type: AccessType::Rw,
+            pdo_mapping: false,
+            value: Value::Unsigned64(0),
+        });
         od
     }
 
@@ -384,10 +398,7 @@ mod tests {
         .unwrap();
         let resp = server().on_frame(&mut od, &req).unwrap();
         assert!(super::super::decode_download_response(&resp).is_ok());
-        assert_eq!(
-            od.read(Address::new(0x1017, 0)).unwrap(),
-            Value::Unsigned16(1234)
-        );
+        assert_eq!(od.read(0x1017, 0).unwrap(), Value::Unsigned16(1234));
     }
 
     #[test]

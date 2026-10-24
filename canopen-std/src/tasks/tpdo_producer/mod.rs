@@ -12,7 +12,7 @@ use tokio::{
 };
 use tracing::error;
 
-use crate::{core::object_dictionary::ObjectDictionary, Error, MsgOut};
+use crate::{objects::ObjectDictionary, Error, MsgOut};
 
 use super::StartupInfo;
 
@@ -29,10 +29,14 @@ impl TaskTpdoProducer {
     pub async fn run(self) -> Result<(), Error> {
         let mut info: HashMap<String, String> = HashMap::new();
 
-        let config = self.od.lock().await.read_0x1800(self.tpdo_index)?;
+        let config = self
+            .od
+            .lock()
+            .await
+            .read_tpdo_communication(self.tpdo_index)?;
         info.insert("COB-ID".into(), format!("{:x?} (0x)", config.cob_id));
 
-        let mapping = self.od.lock().await.read_0x1A00(self.tpdo_index)?;
+        let mapping = self.od.lock().await.read_tpdo_mapping(self.tpdo_index)?;
 
         let (tx, rx) = mpsc::channel::<int_msg::IntMsg>(100);
 

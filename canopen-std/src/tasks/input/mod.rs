@@ -6,9 +6,9 @@ use tokio::sync::{mpsc, Mutex};
 use crate::{
     core::{
         nmt::{NmtCommand, HEARTBEAT_COB_BASE, NMT_COMMAND_COB_ID},
-        object_dictionary::ObjectDictionary,
         sync::{self, SYNC_COB_ID},
     },
+    objects::ObjectDictionary,
     types::Value,
     Error, MsgIn,
 };
@@ -31,7 +31,7 @@ impl Input {
             .od
             .lock()
             .await
-            .read_object_0x1200()?
+            .read_sdo_server()?
             .cob_id_client_to_server;
 
         let cob_id_nmt: Id = NMT_COMMAND_COB_ID;

@@ -9,4 +9,4 @@ pub use {
     object::Object, object_array::ObjectArray, object_record::ObjectRecord, object_var::ObjectVar,
 };
 
-use super::{AccessType, DataType, Entry, EntryArray, EntryRecord};
+use super::{AccessType, DataType, Entry, EntryArray, EntryRecord, Value};

@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use canopen_std::{objects_old::ProducerHeartbeatTime, *};
+use canopen_std::{objects::ProducerHeartbeatTime, types::AccessType, *};
 use embedded_can::Id;
 use tokio::sync::mpsc;
 
@@ -21,12 +21,12 @@ async fn test() {
         output: tx_from_canopen,
         node_id,
         eds: "",
-        entries: [ProducerHeartbeatTime {
-            heartbeat_time: Duration::from_millis(10),
-            heartbeat_time_access: AccessType::Ro,
-        }
-        .entries()]
-        .concat(),
+        objects: vec![
+            ProducerHeartbeatTime {
+                heartbeat_time: Duration::from_millis(10),
+            }
+            .into(),
+        ],
     };
     let node_handle = tokio::spawn(node.run());
 

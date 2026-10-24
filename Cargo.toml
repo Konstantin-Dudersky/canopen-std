@@ -1,23 +1,20 @@
 [workspace]
 resolver = "2"
-members = ["core", "host", "cli", "canopen-std"]
+members = ["core", "canopen-std"]
 
 [workspace.package]
 version = "0.6.1"
-edition = "2021"
+edition = "2024"
 license = "MIT OR Apache-2.0"
 authors = ["Karpagam Karthikeyan"]
 repository = "https://github.com/KarpagamKarthikeyan/canopen-rs"
-rust-version = "1.75"
+rust-version = "1.95"
 keywords = ["canopen", "can", "cia301", "embedded"]
 categories = ["embedded", "network-programming"]
 
 [workspace.dependencies]
 # The no_std core, depended on by host crates.
 canopen-rs = { path = "core", version = "0.6.1" }
-
-# The std host layer, depended on by the CLI.
-canopen-host = { path = "host", version = "0.6.1" }
 
 # Transport-agnostic CAN frame/id abstraction (no_std).
 embedded-can = "0.4.1"

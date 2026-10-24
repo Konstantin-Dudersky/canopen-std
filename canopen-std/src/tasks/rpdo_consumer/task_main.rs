@@ -1,9 +1,6 @@
 use tokio::sync::mpsc;
 
-use crate::{
-    core::object_dictionary::ObjectDictionary, objects_old::RpdoMapping, types::Value, Entry,
-    Error, MsgOut,
-};
+use crate::{types::Value, Error, MsgOut};
 
 use super::int_msg::IntMsg;
 

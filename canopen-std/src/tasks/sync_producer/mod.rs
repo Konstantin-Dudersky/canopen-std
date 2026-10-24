@@ -1,16 +1,14 @@
 use std::{sync::Arc, time::Duration};
 
 use tokio::{
-    sync::{mpsc, Mutex},
+    sync::{Mutex, mpsc},
     time::sleep,
 };
 
 use crate::{
-    core::{
-        object_dictionary::ObjectDictionary,
-        sync::{encode_counter, SyncCounter},
-    },
     Error, MsgOut,
+    core::sync::{SyncCounter, encode_counter},
+    objects::ObjectDictionary,
 };
 
 pub struct TaskSyncProducer {
@@ -27,14 +25,14 @@ impl TaskSyncProducer {
         }
         let cob_id_sync_message = obj_0x1005.cob_id;
 
-        let obj_0x1006 = self.od.lock().await.read_0x1006()?;
+        let obj_0x1006 = self.od.lock().await.read_comm_cycle_period()?;
         let period = obj_0x1006.period;
         // Выходим, если период равен 0
         if period == Duration::from_millis(0) {
             return Ok(());
         }
 
-        let obj_0x1019 = self.od.lock().await.read_0x1019()?;
+        let obj_0x1019 = self.od.lock().await.read_sync_counter_overflow()?;
         let counter_overflow = obj_0x1019.counter;
 
         let mut counter = SyncCounter::new(counter_overflow)?;
@@ -55,11 +53,3 @@ impl TaskSyncProducer {
         }
     }
 }
-
-// pub fn produce_sync(&mut self) -> Option<TxFrame> {
-//     let counter = self.sync_producer.as_mut()?;
-//     Some(match counter.advance() {
-//         Some(count) => TxFrame::new(sync::SYNC_COB_ID, &sync::encode_counter(count)),
-//         None => TxFrame::new(sync::SYNC_COB_ID, &[]),
-//     })
-// }

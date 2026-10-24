@@ -26,14 +26,17 @@
 //! assert!(od.write(Address::new(0x1000, 0), Value::Unsigned32(1)).is_err()); // read-only
 //! ```
 
-mod access_type;
+// mod access_type;
 mod address;
 pub mod objects_old;
-pub use {access_type::AccessType, address::Address};
+pub use address::Address;
 
 use {canopen_rs::NodeId, std::collections::HashMap};
 
-use crate::{types::Value, Error};
+use crate::{
+    types::{AccessType, Value},
+    Error,
+};
 
 /// A single object dictionary entry: a typed value and its access rights.
 #[derive(Debug, Clone, Copy, PartialEq)]

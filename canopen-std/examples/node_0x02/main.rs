@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use canopen_std::*;
+use canopen_std::{types::Value, *};
 use tokio::{sync::mpsc, task::JoinSet, time::sleep};
 use tracing::warn;
 
@@ -24,8 +24,8 @@ async fn main() {
         input: rx_to_canopen,
         output: tx_from_canopen,
         node_id: 0x02,
-        eds: include_str!("./EK-IO-DI-v0.2.0.eds"),
-        entries: vec![],
+        eds: include_str!("/home/konstantin/projects/plc-modules/firmware/ek_modules_eds_dbc/EDS/EK-IO-DI-v0.2.0.eds"),
+        objects: vec![],
     };
 
     task_set.spawn(node.run());

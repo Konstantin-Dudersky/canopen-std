@@ -2,19 +2,17 @@ use std::{collections::HashMap, sync::Arc, time::Duration};
 
 use canopen_rs::NodeId;
 use tokio::{
-    sync::{mpsc, Mutex},
+    sync::{Mutex, mpsc},
     time::sleep,
 };
 
 use crate::{
-    core::{
-        nmt::{encode_heartbeat, heartbeat_cob_id, NmtStateMachine},
-        object_dictionary::ObjectDictionary,
-    },
     Error, MsgOut,
+    core::nmt::{NmtStateMachine, encode_heartbeat, heartbeat_cob_id},
+    objects::ObjectDictionary,
 };
 
-use super::{startup_info::id_to_string, StartupInfo};
+use super::{StartupInfo, startup_info::id_to_string};
 
 pub struct TaskHeartbeatProducer {
     pub output: mpsc::Sender<MsgOut>,
@@ -28,7 +26,12 @@ impl TaskHeartbeatProducer {
     pub async fn run(self) -> Result<(), Error> {
         let mut startup_info: HashMap<String, String> = HashMap::new();
 
-        let heartbeat_time = self.od.lock().await.read_object_0x1017()?.heartbeat_time;
+        let heartbeat_time = self
+            .od
+            .lock()
+            .await
+            .read_producer_heartbeat_time()?
+            .heartbeat_time;
 
         // Если время hearbeat не задано, то завершаем задачу
         if heartbeat_time == Duration::from_millis(0) {

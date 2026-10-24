@@ -33,7 +33,7 @@ use super::{
     encode_upload_request, encode_upload_segment_request, SdoPayload, SEGMENT_DATA_MAX,
 };
 use crate::{
-    core::datatypes::MAX_STRING_LEN,
+    types::MAX_STRING_LEN,
     types::{DataType, Value},
 };
 use embedded_can::Id;
