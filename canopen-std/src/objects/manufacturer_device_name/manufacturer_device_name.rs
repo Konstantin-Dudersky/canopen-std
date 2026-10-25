@@ -1,4 +1,5 @@
 /// 0x1008: Manufacturer device name
+#[derive(Clone, Debug, Default)]
 pub struct ManufacturerDeviceName {
     pub name: String,
 }

@@ -1,4 +1,5 @@
 /// 0x1018: Identity object
+#[derive(Clone, Debug, Default)]
 pub struct IdentityObject {
     pub vendor_id: u32,
     pub product_code: u32,

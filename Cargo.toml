@@ -19,15 +19,11 @@ canopen-rs = { path = "core", version = "0.6.1" }
 # Transport-agnostic CAN frame/id abstraction (no_std).
 embedded-can = "0.4.1"
 
-# Bounded, allocation-free collections for the no_std object dictionary.
-# DEPRECATED
+# # Bounded, allocation-free collections for the no_std object dictionary.
+# # DEPRECATED
 heapless = "0.8.0"
 
-# Linux SocketCAN transport (host only, Linux only).
-# DEPRECATED
-socketcan = { version = "3.3" }
-
-tokio = { version = "1.53.2", default-features = false, features = [ "macros", "rt", "sync" ,"time" ] }
+tokio = { version = "1.54.1", default-features = false, features = [ "macros", "rt", "sync" ,"time" ] }
 thiserror = { version = "2.0.21" }
 anyhow = { version = "1.0.104" }
 tracing = { version = "0.1.44" }

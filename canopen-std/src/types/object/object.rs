@@ -93,14 +93,34 @@ impl Object {
             _ => return vec![],
         };
 
-        entries
+        let mut entries = entries
             .iter()
             .filter(|o| o.subindex != 0)
             .cloned()
-            .collect::<Vec<Entry>>()
+            .collect::<Vec<Entry>>();
+        entries.sort_by_key(|e| e.subindex);
+        entries
     }
 
-    pub fn to_eds(&self) -> String {
+    pub fn get_all_entries(&self) -> Vec<Entry> {
+        let entries = match self {
+            Object::Var { entry, .. } => vec![entry.clone()],
+            Object::Array { entries, .. } => entries.clone(),
+            Object::Record { entries, .. } => entries.clone(),
+            _ => vec![],
+        };
+
+        let mut entries = entries
+            .iter()
+            .filter(|o| o.subindex != 0)
+            .cloned()
+            .collect::<Vec<Entry>>();
+        entries.push(self.get_entry(0).unwrap());
+        entries.sort_by_key(|e| e.subindex);
+        entries
+    }
+
+    pub fn to_eds_str(&self) -> String {
         match self {
             Object::Null => todo!(),
             Object::Domain => todo!(),
@@ -133,12 +153,12 @@ PDOMapping={pdo_mapping}
             Object::Array {
                 index,
                 name,
-                entries,
+                entries: _,
             } => {
-                let highest_subindex = entries.len() as u16;
-                let sub_number = highest_subindex + 1;
+                let sub_number = self.get_all_entries().len();
 
-                let entries_eds = entries
+                let entries_eds = self
+                    .get_all_entries()
                     .iter()
                     .map(|entry| {
                         let subindex = entry.subindex;
@@ -167,13 +187,6 @@ PDOMapping={pdo_mapping}
 ParameterName={name}
 ObjectType=0x8
 SubNumber={sub_number}
-
-[{index:04X}sub0]
-ParameterName=Highest sub-index supported
-DataType=0x05
-AccessType=ro
-DefaultValue={highest_subindex}
-PDOMapping=0
 {entries_eds}
 "#
                 )
@@ -181,12 +194,12 @@ PDOMapping=0
             Object::Record {
                 index,
                 name,
-                entries,
+                entries: _,
             } => {
-                let highest_subindex = entries.len() as u16;
-                let sub_number = highest_subindex + 1;
+                let sub_number = self.get_all_entries().len();
 
-                let entries_eds = entries
+                let entries_eds = self
+                    .get_all_entries()
                     .iter()
                     .map(|entry| {
                         let subindex = entry.subindex;
@@ -215,13 +228,6 @@ PDOMapping={pdo_mapping}
 ParameterName={name}
 ObjectType=0x9
 SubNumber={sub_number}
-
-[{index:04X}sub0]
-ParameterName=Highest sub-index supported
-DataType=0x05
-AccessType=ro
-DefaultValue={highest_subindex}
-PDOMapping=0
 {entries_eds}
 "#
                 )

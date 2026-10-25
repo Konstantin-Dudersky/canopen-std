@@ -4,7 +4,7 @@ use bitvec::{field::BitField, order::Msb0, slice::BitSlice};
 
 use crate::Error;
 
-use super::super::{byte_string::MAX_STRING_LEN, ByteString};
+use super::super::{ByteString, byte_string::MAX_STRING_LEN};
 use super::DataType;
 
 /// A typed CANopen value.
@@ -246,6 +246,20 @@ impl Value {
     pub fn get_unsigned32(&self) -> Result<u32, Error> {
         match self {
             Value::Unsigned32(v) => Ok(*v),
+            _ => {
+                let loc = std::panic::Location::caller();
+                Err(Error::TypeMismatch2 {
+                    value: *self,
+                    location: loc.to_string(),
+                })
+            }
+        }
+    }
+
+    #[track_caller]
+    pub fn get_visible_string(&self) -> Result<ByteString, Error> {
+        match self {
+            Value::VisibleString(v) => Ok(*v),
             _ => {
                 let loc = std::panic::Location::caller();
                 Err(Error::TypeMismatch2 {

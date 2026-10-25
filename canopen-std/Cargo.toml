@@ -11,13 +11,13 @@ categories.workspace = true
 
 [dependencies]
 anyhow = { workspace = true }
-# canopen-host = { workspace = true }
+bitvec = { version = "1.1.1" }
 canopen-rs = { workspace = true, features = ["std"] }
 embedded-can = { workspace = true }
 thiserror = { workspace = true }
+time = { version = "0.3.55", features = ["formatting", "local-offset", "macros"] }
 tokio = { workspace = true }
 tracing = { workspace = true }
-bitvec = { version = "1.1.1" }
 
 
 [dev-dependencies]

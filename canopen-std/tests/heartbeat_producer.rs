@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use canopen_std::{objects::ProducerHeartbeatTime, types::AccessType, *};
+use canopen_std::{objects::ProducerHeartbeatTime, *};
 use embedded_can::Id;
 use tokio::sync::mpsc;
 
@@ -20,7 +20,7 @@ async fn test() {
         input: rx_to_canopen,
         output: tx_from_canopen,
         node_id,
-        eds: "",
+        eds_file: "",
         objects: vec![
             ProducerHeartbeatTime {
                 heartbeat_time: Duration::from_millis(10),

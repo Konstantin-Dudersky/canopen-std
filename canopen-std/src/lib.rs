@@ -7,10 +7,8 @@ pub mod objects;
 mod tasks;
 pub mod types;
 
-/// Electronic Data Sheet (EDS) / Device Configuration File (DCF) parsing.
-///
-/// Cross-platform: EDS files are plain text and carry no OS dependency.
-mod eds;
+/// Electronic Data Sheet (EDS)
+pub mod eds;
 
 pub use {
     canopen_node::CANopenNode,

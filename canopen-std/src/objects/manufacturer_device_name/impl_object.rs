@@ -1,4 +1,7 @@
-use crate::types::{AccessType, ByteString, Object, ObjectVar, Value};
+use crate::{
+    Error,
+    types::{AccessType, ByteString, Object, ObjectVar, Value},
+};
 
 use super::ManufacturerDeviceName;
 
@@ -14,5 +17,25 @@ impl From<ManufacturerDeviceName> for Object {
             value,
         }
         .into()
+    }
+}
+
+impl TryFrom<&Object> for ManufacturerDeviceName {
+    type Error = Error;
+
+    fn try_from(obj: &Object) -> Result<Self, Self::Error> {
+        let entry = obj.get_entry(0).ok_or(Error::EntryNotFound {
+            index: Self::INDEX,
+            subindex: 0,
+        })?;
+
+        let name = entry
+            .value
+            .get_visible_string()?
+            .as_str()
+            .unwrap()
+            .to_string();
+
+        Ok(Self { name })
     }
 }

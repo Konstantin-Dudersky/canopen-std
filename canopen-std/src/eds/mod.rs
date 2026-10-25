@@ -25,17 +25,29 @@
 //!   against the file's `[DeviceComissioning] NodeID` when present.
 
 mod eds_error;
+mod section_comments;
+mod section_device_info;
+mod section_dummy_usage;
+mod section_file_info;
+mod sections_object_count;
 
-pub use eds_error::EdsError;
+pub use {
+    eds_error::EdsError, section_comments::Comments, section_device_info::DeviceInfo,
+    section_dummy_usage::DummyUsage, section_file_info::FileInfo,
+    sections_object_count::ObjectCount as ObjectsCount,
+};
+
+type EdsFileSection = BTreeMap<String, String>;
 
 use std::{collections::BTreeMap, fs, path::Path};
 
 use crate::{
+    Error,
     core::object_dictionary::Address,
     objects::ObjectDictionary as ObjectDictionaryNew,
     types::{
-        AccessType, ByteString, DataType, Entry, EntryArray, EntryRecord, Object, ObjectArray,
-        ObjectRecord, ObjectType, ObjectVar, Value, MAX_STRING_LEN,
+        AccessType, ByteString, DataType, Entry, EntryArray, EntryRecord, MAX_STRING_LEN, Object,
+        ObjectArray, ObjectRecord, ObjectType, ObjectVar, Value,
     },
 };
 use canopen_rs::NodeId;
@@ -44,14 +56,13 @@ use tracing::warn;
 /// A parsed Electronic Data Sheet (or Device Configuration File).
 #[derive(Debug, Clone)]
 pub struct Eds {
-    /// `[DeviceInfo] VendorName`, if present.
-    pub vendor_name: Option<String>,
-    /// `[DeviceInfo] ProductName`, if present.
-    pub product_name: Option<String>,
-    /// `[DeviceComissioning] NodeID`, if present — also used to resolve
-    /// `$NODEID` expressions in default values.
-    pub node_id: u8,
-    // /// The described objects, ordered by address.
+    /// [DeviceInfo] section
+    pub device_info: DeviceInfo,
+
+    /// [FileInfo] section
+    pub file_info: FileInfo,
+
+    /// The described objects, ordered by address.
     pub objects: Vec<Object>,
 }
 
@@ -60,9 +71,11 @@ impl Eds {
     pub fn parse(text: &str, node_id: NodeId) -> Result<Eds, EdsError> {
         let sections = parse_ini(text);
 
-        let device = sections.get("deviceinfo");
-        let vendor_name = device.and_then(|s| s.get("vendorname")).cloned();
-        let product_name = device.and_then(|s| s.get("productname")).cloned();
+        let device_info = sections.get("deviceinfo");
+        let device_info = match device_info {
+            Some(s) => s.into(),
+            None => DeviceInfo::default(),
+        };
 
         let node_for_expr = node_id.raw();
 
@@ -203,9 +216,8 @@ impl Eds {
         }
 
         Ok(Eds {
-            vendor_name,
-            product_name,
-            node_id: node_id.raw(),
+            device_info,
+            file_info: FileInfo::default(),
             objects,
         })
     }
@@ -226,6 +238,46 @@ impl Eds {
             od.insert_object(obj.clone());
         }
         Ok(od)
+    }
+
+    pub fn to_eds_str(&self) -> Result<String, Error> {
+        let mut eds_str = String::new();
+
+        let obj_dict = self.object_dictionary(NodeId::new(1).unwrap()).unwrap();
+
+        let file_info = self.file_info.to_eds_str(&obj_dict)?;
+        eds_str.push_str(&file_info);
+
+        let device_info = &self.device_info.to_eds_str(&obj_dict)?;
+        eds_str.push_str(device_info);
+
+        let dummy_usage = DummyUsage {}.to_eds_str();
+        eds_str.push_str(&dummy_usage);
+
+        let comments = Comments {}.to_eds_str();
+        eds_str.push_str(&comments);
+
+        let object_count = ObjectsCount {}.to_eds_str(&self.objects);
+        eds_str.push_str(&object_count);
+
+        eds_str.push('\n');
+
+        let mut objects = self.objects.clone();
+        objects.sort_by_key(|obj| obj.index());
+
+        for object in objects.iter() {
+            eds_str.push_str(&object.to_eds_str());
+        }
+
+        Ok(eds_str)
+    }
+
+    pub fn save_in_folder(&self, path: impl AsRef<Path>) -> anyhow::Result<()> {
+        let path = path.as_ref().join(&self.file_info.file_name);
+
+        let contents = self.to_eds_str()?;
+        fs::write(path, contents).map_err(|e| anyhow::anyhow!(e))?;
+        Ok(())
     }
 }
 
@@ -310,14 +362,14 @@ fn value_from_str(data_type: DataType, s: &str, node_id: u8) -> Option<Value> {
                 0.0
             } else {
                 s.parse().ok()?
-            }))
+            }));
         }
         DataType::Real64 => {
             return Some(Value::Real64(if s.is_empty() {
                 0.0
             } else {
                 s.parse().ok()?
-            }))
+            }));
         }
         _ => {}
     }
@@ -434,9 +486,7 @@ DefaultValue=1.5
     #[test]
     fn reads_device_metadata_and_node_id() {
         let eds = sample();
-        assert_eq!(eds.vendor_name.as_deref(), Some("Acme Robotics"));
-        assert_eq!(eds.product_name.as_deref(), Some("Widget 3000"));
-        assert_eq!(eds.node_id, 0x10);
+        assert_eq!(eds.device_info.vendor_name, "Acme Robotics");
     }
 
     #[test]

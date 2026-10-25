@@ -1,4 +1,5 @@
 /// 0x1001: Error register
+#[derive(Clone, Debug, Default)]
 pub struct ErrorRegister {
     pub generic_error: bool,
     pub current: bool,

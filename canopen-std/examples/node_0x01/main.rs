@@ -24,7 +24,9 @@ async fn main() {
         input: rx_to_canopen,
         output: tx_from_canopen,
         node_id: 0x01,
-        eds: include_str!("/home/konstantin/projects/plc-modules/firmware/ek_modules_eds_dbc/EDS/EK-CP-LLP-v0.2.0.eds"),
+        eds_file: include_str!(
+            "/home/konstantin/projects/plc-modules/firmware/ek_modules_eds_dbc/EDS/EK-CP-LLP-v0.2.0.eds"
+        ),
         objects: vec![],
     };
 

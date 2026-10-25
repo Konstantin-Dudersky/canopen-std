@@ -5,10 +5,9 @@ mod common;
 use std::time::Duration;
 
 use canopen_std::{
-    objects,
+    CANopenNode, MsgIn, MsgOut, objects,
     objects_old::PdoMappingItem,
     types::{AccessType, EntryRecord, ObjectRecord, Value},
-    CANopenNode, MsgIn, MsgOut,
 };
 use common::{init_logging, recv_until};
 use embedded_can::StandardId;
@@ -28,7 +27,7 @@ async fn rpdo_consumer() {
         input: rx_to_canopen,
         output: tx_from_canopen,
         node_id,
-        eds: "",
+        eds_file: "",
         objects: vec![
             objects::RpdoCommunication {
                 sequence_number: 0,

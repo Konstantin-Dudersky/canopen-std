@@ -67,7 +67,7 @@ pub use {
     sdo_server::SdoServer,
     sync_counter_overflow::SyncCounterOverflow,
     sync_message_cob_id::SyncMessageCobId,
-    tpdo_communication::{TpdoCommunication, TpdoTransmissionType},
+    tpdo_communication::{TpdoCommunication, TpdoCommunicationCobId, TpdoTransmissionType},
     tpdo_mapping::TpdoMapping,
 };
 

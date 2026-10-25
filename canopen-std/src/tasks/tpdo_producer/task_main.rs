@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use bitvec::{order::Msb0, view::BitView};
-use tokio::sync::{mpsc, Mutex, Notify};
+use tokio::sync::{Mutex, Notify, mpsc};
 use tracing::trace;
 
 use crate::objects::{ObjectDictionary, TpdoCommunication, TpdoMapping, TpdoTransmissionType};
@@ -25,6 +25,9 @@ impl TaskMain {
             pack_tpdo(&self.mapping, &od)?
         };
         let mut data_for_send: Option<Vec<u8>> = None;
+
+        let node_id = self.od.lock().await.node_id;
+        let id = self.config.get_cob_id_for_node(node_id)?;
 
         let mut state = match self.config.transmission_type {
             TpdoTransmissionType::SyncronousAcyclic => State::SyncAcyclicWaitEvent,
@@ -111,10 +114,7 @@ impl TaskMain {
                         }
                         None => data_prev.clone(),
                     };
-                    let msg_out = MsgOut::CanFrame {
-                        id: self.config.cob_id,
-                        data,
-                    };
+                    let msg_out = MsgOut::CanFrame { id, data };
                     self.output.send(msg_out).await.unwrap();
 
                     trace!("reset timers");
@@ -140,10 +140,7 @@ impl TaskMain {
                         }
                         None => data_prev.clone(),
                     };
-                    let msg_out = MsgOut::CanFrame {
-                        id: self.config.cob_id,
-                        data,
-                    };
+                    let msg_out = MsgOut::CanFrame { id, data };
                     self.output.send(msg_out).await.unwrap();
 
                     State::SyncWait {
@@ -168,10 +165,7 @@ impl TaskMain {
                         None => data_prev.clone(),
                     };
 
-                    let msg_out = MsgOut::CanFrame {
-                        id: self.config.cob_id,
-                        data,
-                    };
+                    let msg_out = MsgOut::CanFrame { id, data };
                     self.output.send(msg_out).await.unwrap();
 
                     trace!("reset timers");

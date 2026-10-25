@@ -3,19 +3,19 @@ use std::{collections::HashMap, sync::Arc, time::Duration};
 use canopen_rs::NodeId;
 use embedded_can::Id;
 use tokio::{
-    sync::{broadcast, mpsc, Mutex},
+    sync::{Mutex, broadcast, mpsc},
     task::JoinSet,
     time::sleep,
 };
 use tracing::error;
 
 use crate::{
+    Error, MsgIn, MsgOut,
     core::nmt::{NmtCommand, NmtStateMachine},
     eds::Eds,
     objects::ObjectDictionary,
     tasks::{self, StartupInfo},
     types::{Object, Value},
-    Error, MsgIn, MsgOut,
 };
 
 pub struct CANopenNode {
@@ -29,7 +29,7 @@ pub struct CANopenNode {
     pub node_id: u8,
 
     /// Содержимое EDS-файла
-    pub eds: &'static str,
+    pub eds_file: &'static str,
 
     pub objects: Vec<Object>,
 }
@@ -41,7 +41,7 @@ impl CANopenNode {
         let nmt_state = NmtStateMachine::new();
         let nmt_state = Arc::new(Mutex::new(nmt_state));
 
-        let mut od = Eds::parse(self.eds, node_id)
+        let mut od = Eds::parse(self.eds_file, node_id)
             .unwrap()
             .object_dictionary(node_id)
             .unwrap();

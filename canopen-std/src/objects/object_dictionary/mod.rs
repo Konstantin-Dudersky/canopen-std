@@ -29,8 +29,8 @@
 use canopen_rs::NodeId;
 
 use crate::{
-    types::{Entry, Object, Value},
     Error,
+    types::{Entry, Object, Value},
 };
 
 /// An object dictionary holding up to `N` entries, addressed by
@@ -141,6 +141,10 @@ impl ObjectDictionary {
         }
         entry.value = value;
         Ok(())
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = &Object> {
+        self.objects.iter()
     }
 }
 
