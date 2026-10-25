@@ -1,10 +1,12 @@
 use crate::{
     Error,
-    objects_old::common::{decode_cob_id, encode_cob_id},
     types::{AccessType, Object, ObjectVar},
 };
 
-use super::TimeStampCobId;
+use super::{
+    super::common::{decode_cob_id, encode_cob_id},
+    TimeStampCobId,
+};
 
 impl From<TimeStampCobId> for Object {
     fn from(value: TimeStampCobId) -> Self {

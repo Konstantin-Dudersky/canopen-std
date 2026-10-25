@@ -28,14 +28,13 @@
 
 // mod access_type;
 mod address;
-pub mod objects_old;
 pub use address::Address;
 
 use {canopen_rs::NodeId, std::collections::HashMap};
 
 use crate::{
-    types::{AccessType, Value},
     Error,
+    types::{AccessType, Value},
 };
 
 /// A single object dictionary entry: a typed value and its access rights.

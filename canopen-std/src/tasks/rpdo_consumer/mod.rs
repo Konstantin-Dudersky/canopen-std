@@ -7,13 +7,13 @@ mod task_sync;
 use std::{collections::HashMap, sync::Arc};
 
 use tokio::{
-    sync::{broadcast, mpsc, Mutex},
+    sync::{Mutex, broadcast, mpsc},
     task::JoinSet,
 };
 
-use crate::{objects::ObjectDictionary, Error, MsgOut};
+use crate::{Error, MsgOut, objects::ObjectDictionary};
 
-use super::{startup_info::id_to_string, StartupInfo};
+use super::{StartupInfo, startup_info::id_to_string};
 use int_msg::IntMsg;
 
 pub struct TaskRpdoConsumer {
@@ -34,7 +34,10 @@ impl TaskRpdoConsumer {
             .lock()
             .await
             .read_rpdo_communication(self.sequence_number)?;
-        info.insert("COB-ID".into(), id_to_string(config.cob_id));
+        let node_id = self.od.lock().await.node_id;
+        let id = config.get_cob_id_for_node(node_id)?;
+
+        info.insert("COB-ID".into(), id_to_string(id));
         info.insert(
             "Transmission type".into(),
             config.transmission_type.to_string(),

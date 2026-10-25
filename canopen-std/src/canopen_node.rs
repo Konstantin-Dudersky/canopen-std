@@ -254,8 +254,10 @@ async fn spawn_rpdo_consumer(
             continue;
         }
 
+        let id = param.get_cob_id_for_node(od.lock().await.node_id)?;
+
         let (tx, rx) = mpsc::channel::<Vec<u8>>(100);
-        rpdos.insert(param.cob_id, tx);
+        rpdos.insert(id, tx);
 
         let task = tasks::TaskRpdoConsumer {
             input_frame: rx,

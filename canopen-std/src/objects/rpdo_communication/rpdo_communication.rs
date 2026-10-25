@@ -1,21 +1,14 @@
-pub use super::RpdoTransmissionType;
-
 use std::time::Duration;
 
+use canopen_rs::NodeId;
 use embedded_can::{Id, StandardId};
 use tracing::error;
 
-use crate::{
-    objects_old::common::encode_cob_id,
-    types::{AccessType, EntryRecord, Object, ObjectRecord},
-    Error,
-};
+use crate::Error;
 
-use super::Value;
+use super::{super::PdoCommunicationCobId, RpdoTransmissionType};
 
-const SUBINDEX_TRANSMISSION_TYPE: u8 = 2;
-
-/// 0x1400..=0x15FF - RPDO communication parameter
+/// 0x1400..=0x15FF: RPDO communication parameter
 #[derive(Debug)]
 pub struct RpdoCommunication {
     pub sequence_number: u16,
@@ -24,13 +17,7 @@ pub struct RpdoCommunication {
     pub pdo_exist: bool,
 
     /// COB-ID used by RPDO
-    ///
-    /// Default values:
-    /// - 0x1400 - 0x200 + Node-ID
-    /// - 0x1401 - 0x300 + Node-ID
-    /// - 0x1402 - 0x400 + Node-ID
-    /// - 0x1403 - 0x500 + Node-ID
-    pub cob_id: Id,
+    pub cob_id: PdoCommunicationCobId,
 
     /// transmission type
     pub transmission_type: RpdoTransmissionType,
@@ -43,8 +30,23 @@ pub struct RpdoCommunication {
 }
 
 impl RpdoCommunication {
-    pub fn default_cob_id(node_id: u8, sequence_number: u16) -> Result<Id, Error> {
-        let cob_id_base = match sequence_number {
+    pub const SUBINDEX_COB_ID: u8 = 1;
+    pub const SUBINDEX_TRANSMISSION_TYPE: u8 = 2;
+    pub const SUBINDEX_INHIBIT_TIME: u8 = 3;
+    pub const SUBINDEX_EVENT_TIMER: u8 = 5;
+
+    pub const INDEX_BASE: u16 = 0x1400;
+
+    pub const fn index(&self) -> u16 {
+        Self::INDEX_BASE + self.sequence_number
+    }
+
+    pub fn name(&self) -> String {
+        format!("RPDO communication parameter #{}", self.sequence_number + 1)
+    }
+
+    pub fn get_cob_id_offset(&self) -> Result<u32, Error> {
+        let offset = match self.sequence_number {
             0 => 0x200,
             1 => 0x300,
             2 => 0x400,
@@ -54,65 +56,31 @@ impl RpdoCommunication {
                 return Err(Error::InvalidCobId);
             }
         };
-        let cob_id = StandardId::new(cob_id_base + node_id as u16).ok_or(Error::InvalidCobId)?;
-        Ok(cob_id.into())
+        Ok(offset)
+    }
+
+    pub fn get_cob_id_for_node(&self, node_id: NodeId) -> Result<Id, Error> {
+        match self.cob_id {
+            PdoCommunicationCobId::RelativeNodeId => {
+                let cob_id_base = self.get_cob_id_offset()?;
+                let cob_id = cob_id_base + node_id.raw() as u32;
+                let id = StandardId::new(cob_id as u16).ok_or(Error::InvalidCobId)?;
+                Ok(id.into())
+            }
+            PdoCommunicationCobId::Specific(id) => Ok(id),
+        }
     }
 }
 
-impl From<RpdoCommunication> for Object {
-    fn from(value: RpdoCommunication) -> Self {
-        Object::from(ObjectRecord {
-            index: 0x1400 + value.sequence_number,
-            name: "RPDO communication parameter".into(),
-            entries: vec![
-                EntryRecord {
-                    subindex: 1,
-                    description: "COB-ID used by RPDO".into(),
-                    access_type: AccessType::Ro,
-                    pdo_mapping: false,
-                    value: encode_cob_id(false, false, value.cob_id),
-                },
-                EntryRecord {
-                    subindex: SUBINDEX_TRANSMISSION_TYPE,
-                    description: "transmission type".into(),
-                    access_type: AccessType::Ro,
-                    pdo_mapping: false,
-                    value: Value::Unsigned8(value.transmission_type.into()),
-                },
-                EntryRecord {
-                    subindex: 3,
-                    description: "inhibit time".into(),
-                    access_type: AccessType::Ro,
-                    pdo_mapping: false,
-                    value: Value::Unsigned16(value.inhibit_time.as_micros() as u16 / 100),
-                },
-                EntryRecord {
-                    subindex: 5,
-                    description: "event timer".into(),
-                    access_type: AccessType::Ro,
-                    pdo_mapping: false,
-                    value: Value::Unsigned16(value.event_timer.as_millis() as u16),
-                },
-            ],
-        })
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    use embedded_can::StandardId;
-    use pretty_assertions::assert_eq;
-
-    #[test]
-    fn default_cob_id() {
-        let cob_id = RpdoCommunication::default_cob_id(0x17, 1);
-
-        assert!(cob_id.is_ok());
-        assert_eq!(
-            cob_id.unwrap(),
-            Id::Standard(StandardId::new(0x317).unwrap())
-        );
+impl Default for RpdoCommunication {
+    fn default() -> Self {
+        Self {
+            sequence_number: 0,
+            pdo_exist: false,
+            cob_id: PdoCommunicationCobId::RelativeNodeId,
+            transmission_type: RpdoTransmissionType::Syncronous,
+            inhibit_time: Duration::default(),
+            event_timer: Duration::default(),
+        }
     }
 }

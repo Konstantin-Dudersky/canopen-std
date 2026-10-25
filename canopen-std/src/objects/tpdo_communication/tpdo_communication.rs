@@ -6,7 +6,8 @@ use tracing::error;
 
 use crate::Error;
 
-use super::{TpdoCommunicationCobId, TpdoTransmissionType};
+use super::super::PdoCommunicationCobId;
+use super::TpdoTransmissionType;
 
 /// 0x1800..=0x19FF: TPDO communication parameter
 #[derive(Clone, Debug)]
@@ -17,7 +18,7 @@ pub struct TpdoCommunication {
     pub pdo_exist: bool,
 
     /// COB-ID used by TPDO
-    pub cob_id: TpdoCommunicationCobId,
+    pub cob_id: PdoCommunicationCobId,
 
     /// transmission type
     pub transmission_type: TpdoTransmissionType,
@@ -39,32 +40,39 @@ impl TpdoCommunication {
     pub const SUBINDEX_EVENT_TIMER: u8 = 5;
     pub const SUBINDEX_SYNC_START_VALUE: u8 = 6;
 
+    pub const INDEX_BASE: u16 = 0x1800;
+
     pub const fn index(&self) -> u16 {
-        0x1800 + self.sequence_number
+        Self::INDEX_BASE + self.sequence_number
     }
 
     pub fn name(&self) -> String {
         format!("TPDO communication parameter #{}", self.sequence_number + 1)
     }
 
+    pub fn get_cob_id_offset(&self) -> Result<u32, Error> {
+        let offset = match self.sequence_number {
+            0 => 0x180,
+            1 => 0x280,
+            2 => 0x380,
+            3 => 0x480,
+            _ => {
+                error!("Max sequence_number for RPDO currently 3");
+                return Err(Error::InvalidCobId);
+            }
+        };
+        Ok(offset)
+    }
+
     pub fn get_cob_id_for_node(&self, node_id: NodeId) -> Result<Id, Error> {
         match self.cob_id {
-            TpdoCommunicationCobId::RelativeNodeId => {
-                let cob_id_base = match self.sequence_number {
-                    0 => 0x180,
-                    1 => 0x280,
-                    2 => 0x380,
-                    3 => 0x480,
-                    _ => {
-                        error!("Max sequence_number for RPDO currently 3");
-                        return Err(Error::InvalidCobId);
-                    }
-                };
+            PdoCommunicationCobId::RelativeNodeId => {
+                let cob_id_base = self.get_cob_id_offset()?;
                 let cob_id = cob_id_base + node_id.raw() as u32;
                 let id = StandardId::new(cob_id as u16).ok_or(Error::InvalidCobId)?;
                 Ok(id.into())
             }
-            TpdoCommunicationCobId::Specific(id) => Ok(id),
+            PdoCommunicationCobId::Specific(id) => Ok(id),
         }
     }
 }
@@ -74,7 +82,7 @@ impl Default for TpdoCommunication {
         Self {
             sequence_number: 0,
             pdo_exist: false,
-            cob_id: TpdoCommunicationCobId::RelativeNodeId,
+            cob_id: PdoCommunicationCobId::RelativeNodeId,
             transmission_type: TpdoTransmissionType::SyncronousAcyclic,
             inhibit_time: Duration::default(),
             event_timer: Duration::default(),

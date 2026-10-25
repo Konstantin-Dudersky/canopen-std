@@ -6,7 +6,6 @@ use std::time::Duration;
 
 use canopen_std::{
     CANopenNode, MsgIn, MsgOut, objects,
-    objects_old::PdoMappingItem,
     types::{AccessType, EntryRecord, ObjectRecord, Value},
 };
 use common::{init_logging, recv_until};
@@ -32,7 +31,7 @@ async fn rpdo_consumer() {
             objects::RpdoCommunication {
                 sequence_number: 0,
                 pdo_exist: true,
-                cob_id: objects::RpdoCommunication::default_cob_id(0x17, 0).unwrap(),
+                cob_id: objects::PdoCommunicationCobId::RelativeNodeId,
                 transmission_type: objects::RpdoTransmissionType::EventDrivenManufacturer,
                 inhibit_time: Duration::from_millis(0),
                 event_timer: Duration::from_millis(0),
@@ -41,12 +40,12 @@ async fn rpdo_consumer() {
             objects::RpdoMapping {
                 sequence_number: 0,
                 items: vec![
-                    PdoMappingItem {
+                    objects::PdoMappingItem {
                         index: 0x2000,
                         subindex: 1,
                         length: 8,
                     },
-                    PdoMappingItem {
+                    objects::PdoMappingItem {
                         index: 0x2000,
                         subindex: 2,
                         length: 8,

@@ -1,12 +1,41 @@
 use bitvec::{field::BitField, order::Lsb0, view::BitView};
 
-use crate::{types::Value, Error};
+use crate::{
+    Error,
+    types::{AccessType, Entry, EntryRecord, Value},
+};
 
 #[derive(Debug)]
 pub struct PdoMappingItem {
     pub index: u16,
     pub subindex: u8,
     pub length: u8,
+}
+
+impl PdoMappingItem {
+    pub fn convert_items_to_entry_records(items: &[PdoMappingItem]) -> Vec<EntryRecord> {
+        items
+            .iter()
+            .enumerate()
+            .map(|(i, item)| {
+                let subindex = i as u8 + 1;
+                EntryRecord {
+                    subindex,
+                    description: format!("Mapping item #{}", subindex),
+                    access_type: AccessType::Ro,
+                    pdo_mapping: false,
+                    value: item.into(),
+                }
+            })
+            .collect::<Vec<_>>()
+    }
+
+    pub fn convert_entries_to_items(entries: &[Entry]) -> Result<Vec<PdoMappingItem>, Error> {
+        entries
+            .iter()
+            .map(|entry| entry.value.try_into())
+            .collect::<Result<Vec<_>, Error>>()
+    }
 }
 
 impl TryFrom<Value> for PdoMappingItem {
@@ -31,6 +60,12 @@ impl TryFrom<Value> for PdoMappingItem {
 
 impl From<PdoMappingItem> for Value {
     fn from(value: PdoMappingItem) -> Self {
+        Self::from(&value)
+    }
+}
+
+impl From<&PdoMappingItem> for Value {
+    fn from(value: &PdoMappingItem) -> Self {
         let mut raw: u32 = 0;
         let bits = raw.view_bits_mut::<Lsb0>();
         bits[16..32].store_le(value.index);
@@ -46,7 +81,7 @@ mod tests {
 
     #[test]
     fn test() {
-        let item = PdoMappingItem {
+        let item: PdoMappingItem = PdoMappingItem {
             index: 0x1234,
             subindex: 0x56,
             length: 16,

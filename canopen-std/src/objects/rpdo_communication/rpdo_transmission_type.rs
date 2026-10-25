@@ -1,7 +1,9 @@
 use std::fmt::Display;
 
+use crate::types::Value;
+
 /// transmission type
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum RpdoTransmissionType {
     Syncronous,
     EventDrivenManufacturer,
@@ -28,6 +30,12 @@ impl From<RpdoTransmissionType> for u8 {
             RpdoTransmissionType::EventDrivenProfile => 0xFF,
             RpdoTransmissionType::Reserved => 0xF1,
         }
+    }
+}
+
+impl From<RpdoTransmissionType> for Value {
+    fn from(value: RpdoTransmissionType) -> Self {
+        Self::Unsigned8(value.into())
     }
 }
 

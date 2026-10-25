@@ -1,12 +1,7 @@
 #![allow(clippy::module_inception)]
 
+mod common;
 mod object_dictionary;
-
-mod rpdo_communication;
-mod rpdo_mapping;
-mod sdo_server;
-mod tpdo_communication;
-mod tpdo_mapping;
 
 /// 0x1000
 mod device_type;
@@ -50,8 +45,24 @@ mod sync_counter_overflow;
 /// 0x1029
 mod error_behavior;
 
+/// 0x1200
+mod sdo_server;
+
+/// 0x1400..=0x15FF
+mod rpdo_communication;
+
+/// 0x1600..=0x17FF
+mod rpdo_mapping;
+
+/// 0x1800..=0x19FF
+mod tpdo_communication;
+
+/// 0x1A00..=0x1BFF
+mod tpdo_mapping;
+
 pub use {
     comm_cycle_period::CommCyclePeriod,
+    common::{PdoCommunicationCobId, PdoMappingItem},
     consumer_heartbeat_time::{ConsumerHeartbeatTime, ConsumerHeartbeatTimeItem},
     device_type::DeviceType,
     error_behavior::{ErrorBehavior, ErrorBehaviorAction},
@@ -67,8 +78,6 @@ pub use {
     sdo_server::SdoServer,
     sync_counter_overflow::SyncCounterOverflow,
     sync_message_cob_id::SyncMessageCobId,
-    tpdo_communication::{TpdoCommunication, TpdoCommunicationCobId, TpdoTransmissionType},
+    tpdo_communication::{TpdoCommunication, TpdoTransmissionType},
     tpdo_mapping::TpdoMapping,
 };
-
-use crate::types::{AccessType, Object, ObjectVar, Value};

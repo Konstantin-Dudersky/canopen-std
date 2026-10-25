@@ -1,45 +1,23 @@
-use crate::{
-    objects_old::PdoMappingItem,
-    types::{AccessType, EntryRecord, Object, ObjectRecord},
-};
+use super::super::common::PdoMappingItem;
 
-/// 0x1600..=0x17FF - RPDO mapping parameter
-#[derive(Debug)]
+/// 0x1600..=0x17FF: RPDO mapping parameter
+#[derive(Debug, Default)]
 pub struct RpdoMapping {
     pub sequence_number: u16,
     pub items: Vec<PdoMappingItem>,
 }
 
-impl From<RpdoMapping> for Object {
-    fn from(value: RpdoMapping) -> Self {
-        let index = 0x1600 + value.sequence_number;
-
-        let entries: Vec<EntryRecord> = value
-            .items
-            .into_iter()
-            .enumerate()
-            .map(|(i, item)| {
-                let subindex = i as u8 + 1;
-                EntryRecord {
-                    subindex,
-                    description: "Mapping item".to_string(),
-                    access_type: AccessType::Ro,
-                    pdo_mapping: false,
-                    value: item.into(),
-                }
-            })
-            .collect::<Vec<_>>();
-
-        ObjectRecord {
-            index,
-            name: "RPDO Mapping".to_string(),
-            entries,
-        }
-        .into()
-    }
-}
-
 impl RpdoMapping {
+    pub const INDEX_BASE: u16 = 0x1600;
+
+    pub const fn index(&self) -> u16 {
+        Self::INDEX_BASE + self.sequence_number
+    }
+
+    pub fn name(&self) -> String {
+        format!("RPDO mapping parameter #{}", self.sequence_number + 1)
+    }
+
     pub fn bit_size(&self) -> usize {
         self.items.iter().map(|item| item.length as usize).sum()
     }

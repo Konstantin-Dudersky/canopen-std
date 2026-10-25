@@ -1,9 +1,9 @@
 use bitvec::{order::Msb0, view::BitView};
 
 use crate::{
+    Error,
     objects::{ObjectDictionary, RpdoMapping},
     types::Value,
-    Error,
 };
 
 /// Расшифровываем данные RPDO
@@ -47,7 +47,7 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     use crate::{
-        objects_old::{self},
+        objects,
         types::{AccessType, EntryRecord, Object, ObjectRecord},
     };
 
@@ -64,12 +64,12 @@ mod tests {
             RpdoMapping {
                 sequence_number: 0,
                 items: vec![
-                    objects_old::PdoMappingItem {
+                    objects::PdoMappingItem {
                         index: 0x2000,
                         subindex: 1,
                         length: 1,
                     },
-                    objects_old::PdoMappingItem {
+                    objects::PdoMappingItem {
                         index: 0x2000,
                         subindex: 2,
                         length: 8,

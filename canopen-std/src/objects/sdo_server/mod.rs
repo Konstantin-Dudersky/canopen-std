@@ -1,25 +1,17 @@
+mod sdo_server;
+
+pub use sdo_server::SdoServer;
+
 use bitvec::{field::BitField, order::Lsb0, view::BitView};
 use canopen_rs::NodeId;
 use embedded_can::{ExtendedId, Id, StandardId};
 
 use crate::{
-    sdo::{default_cob_id_client_to_server, default_cob_id_server_to_client},
     Error,
+    sdo::{default_cob_id_client_to_server, default_cob_id_server_to_client},
 };
 
 use super::ObjectDictionary;
-
-/// SDO server parameter
-pub struct SdoServer {
-    /// COB-ID client -> server (rx)
-    pub cob_id_client_to_server: Id,
-
-    /// COB-ID server -> client (tx)
-    pub cob_id_server_to_client: Id,
-
-    /// Node-ID of the SDO client
-    pub _node_id_sdo_server: NodeId,
-}
 
 impl ObjectDictionary {
     /// SDO server parameter

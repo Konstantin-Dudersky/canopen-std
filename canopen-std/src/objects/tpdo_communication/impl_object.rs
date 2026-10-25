@@ -2,21 +2,24 @@ use std::time::Duration;
 
 use crate::{
     Error,
-    objects_old::common::{decode_cob_id, encode_cob_id},
     types::{AccessType, EntryRecord, Object, ObjectRecord, Value},
 };
 
-use super::{TpdoCommunication, TpdoCommunicationCobId, TpdoTransmissionType};
+use super::super::{
+    PdoCommunicationCobId,
+    common::{decode_cob_id, encode_cob_id},
+};
+use super::{TpdoCommunication, TpdoTransmissionType};
 
 impl From<TpdoCommunication> for Object {
     fn from(tpdo: TpdoCommunication) -> Self {
         let value_cob_id: Value = match tpdo.cob_id {
-            super::TpdoCommunicationCobId::RelativeNodeId => {
-                Value::RelativeNodeId(tpdo.sequence_number)
-            }
-            super::TpdoCommunicationCobId::Specific(id) => {
-                encode_cob_id(!tpdo.pdo_exist, false, id)
-            }
+            PdoCommunicationCobId::RelativeNodeId => Value::RelativeNodeId(
+                tpdo.get_cob_id_offset()
+                    .expect("Относительный адрес может быть только для первых 4 конфигураций")
+                    as u16,
+            ),
+            PdoCommunicationCobId::Specific(id) => encode_cob_id(!tpdo.pdo_exist, false, id),
         };
 
         let value_transmission_type: Value = tpdo.transmission_type.into();
@@ -80,7 +83,7 @@ impl TryFrom<&Object> for TpdoCommunication {
 
     fn try_from(obj: &Object) -> Result<Self, Self::Error> {
         let index = obj.index();
-        let sequence_number = index - 0x1800;
+        let sequence_number = index - Self::INDEX_BASE;
 
         // COB-ID used by TPDO
         let subindex = TpdoCommunication::SUBINDEX_COB_ID;
@@ -90,9 +93,9 @@ impl TryFrom<&Object> for TpdoCommunication {
         let (pdo_exist, cob_id) = match entry.value {
             Value::Unsigned32(_) => {
                 let (pdo_exist, _, cob_id) = decode_cob_id(entry.value)?;
-                (pdo_exist, TpdoCommunicationCobId::Specific(cob_id))
+                (pdo_exist, PdoCommunicationCobId::Specific(cob_id))
             }
-            Value::RelativeNodeId(_) => (true, TpdoCommunicationCobId::RelativeNodeId),
+            Value::RelativeNodeId(_) => (true, PdoCommunicationCobId::RelativeNodeId),
             _ => return Err(Error::TypeMismatch),
         };
 
