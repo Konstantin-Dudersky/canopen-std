@@ -10,16 +10,16 @@
 
 use super::super::object_dictionary::Address;
 use super::{
+    CCS_DOWNLOAD_INITIATE, CCS_DOWNLOAD_SEGMENT, CCS_UPLOAD_INITIATE, CCS_UPLOAD_SEGMENT, CS_ABORT,
+    CS_MASK, EXPEDITED, SEGMENT_DATA_MAX, SIZE_INDICATED, SdoAbortCode, SdoPayload, TOGGLE,
     decode_data_segment, decode_download_initiate_segmented, encode_abort, encode_data_segment,
     encode_download_response, encode_download_segment_response, encode_upload_expedited_response,
-    encode_upload_initiate_segmented_response, SdoAbortCode, SdoPayload, CCS_DOWNLOAD_INITIATE,
-    CCS_DOWNLOAD_SEGMENT, CCS_UPLOAD_INITIATE, CCS_UPLOAD_SEGMENT, CS_ABORT, CS_MASK, EXPEDITED,
-    SEGMENT_DATA_MAX, SIZE_INDICATED, TOGGLE,
+    encode_upload_initiate_segmented_response,
 };
 use crate::{
-    objects::ObjectDictionary,
-    types::{DataType, Value, MAX_STRING_LEN},
     Error,
+    objects::ObjectDictionary,
+    types::{DataType, MAX_STRING_LEN, Value},
 };
 use embedded_can::Id;
 
@@ -330,12 +330,11 @@ fn abort(addr: Address, code: SdoAbortCode) -> Option<SdoPayload> {
 #[cfg(test)]
 mod tests {
 
-    use crate::types::{AccessType, ObjectVar};
-
-    use super::*;
-    use canopen_rs::NodeId;
     use embedded_can::StandardId;
 
+    use crate::types::{AccessType, NodeId, ObjectVar};
+
+    use super::*;
     fn server() -> SdoServer {
         let request_cob_id: Id = StandardId::new(0x601).unwrap().into();
         let response_cob_id: Id = StandardId::new(0x581).unwrap().into();

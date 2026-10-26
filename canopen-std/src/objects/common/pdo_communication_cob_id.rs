@@ -1,5 +1,6 @@
-use canopen_rs::NodeId;
 use embedded_can::{Id, StandardId};
+
+use crate::types::NodeId;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum PdoCommunicationCobId {

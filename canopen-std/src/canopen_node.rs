@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Arc, time::Duration};
 
-use canopen_rs::NodeId;
+use comfy_table::{presets::UTF8_FULL, *};
 use embedded_can::Id;
 use tokio::{
     sync::{Mutex, broadcast, mpsc},
@@ -15,7 +15,7 @@ use crate::{
     eds::Eds,
     objects::ObjectDictionary,
     tasks::{self, StartupInfo},
-    types::{Object, Value},
+    types::{NodeId, Object, Value},
 };
 
 pub struct CANopenNode {
@@ -46,6 +46,23 @@ impl CANopenNode {
             .object_dictionary(node_id)
             .unwrap();
         self.add_entries(&mut od).unwrap();
+
+        // Выводим содержимое объектного словаря
+        let mut table = Table::new();
+        table
+            .load_style(UTF8_FULL.with_rounded_corners())
+            .set_content_arrangement(ContentArrangement::Dynamic)
+            // .set_width(80)
+            .set_header(vec!["Index\nsubindex", "Description", "Value", "Type"]);
+
+        for object in od.iter() {
+            for row in object.to_table_rows() {
+                table.add_row(row);
+            }
+        }
+
+        println!("{table}");
+
         let od = Arc::new(Mutex::new(od));
 
         let startup_info = tasks::StartupInfo::new();

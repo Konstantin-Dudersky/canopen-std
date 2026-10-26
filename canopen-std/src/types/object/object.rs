@@ -234,6 +234,34 @@ SubNumber={sub_number}
             }
         }
     }
+
+    pub fn to_table_rows(&self) -> Vec<Vec<String>> {
+        let mut result = vec![];
+
+        result.push(vec![
+            format!("0x{:04X}", self.index()),
+            self.name().to_string(),
+            "".to_string(),
+            match self {
+                Object::Var { .. } => "Var",
+                Object::Array { .. } => "Array",
+                Object::Record { .. } => "Record",
+                _ => "",
+            }
+            .to_string(),
+        ]);
+
+        for entry in self.get_all_entries() {
+            result.push(vec![
+                format!("- {}", entry.subindex),
+                entry.description.as_deref().unwrap_or_default().to_string(),
+                format!("{}", entry.value),
+                format!("{:?}", entry.value.data_type()),
+            ]);
+        }
+
+        result
+    }
 }
 
 impl Object {

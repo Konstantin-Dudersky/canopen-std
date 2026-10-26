@@ -14,7 +14,7 @@ impl From<ConsumerHeartbeatTime> for Object {
             let description = format!("{} #{}", ConsumerHeartbeatTime::NAME, subindex + 1);
 
             let entry = EntryArray {
-                subindex: subindex as u8,
+                subindex: subindex as u8 + 1,
                 description,
                 access_type: AccessType::Rw,
                 pdo_mapping: false,

@@ -1,12 +1,12 @@
 use std::sync::Arc;
 
-use canopen_rs::NodeId;
-use tokio::sync::{mpsc, Mutex};
+use tokio::sync::{Mutex, mpsc};
 use tracing::info;
 
 use crate::{
-    core::nmt::{decode_command, heartbeat_cob_id, NmtState, NmtStateMachine, BOOTUP_FRAME},
     Error, MsgOut,
+    core::nmt::{BOOTUP_FRAME, NmtState, NmtStateMachine, decode_command, heartbeat_cob_id},
+    types::NodeId,
 };
 
 use super::int_msg::IntMsg;

@@ -47,11 +47,11 @@
 mod nmt_state;
 mod nmt_state_machine;
 
-use canopen_rs::NodeId;
 use embedded_can::{Id, StandardId};
+
 pub use {nmt_state::NmtState, nmt_state_machine::NmtStateMachine};
 
-use crate::Error;
+use crate::{Error, types::NodeId};
 
 /// COB-ID of the NMT node-control channel (master → nodes): `0x000`.
 ///

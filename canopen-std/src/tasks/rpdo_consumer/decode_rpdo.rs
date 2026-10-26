@@ -42,13 +42,12 @@ fn decode_rpdo(
 
 #[cfg(test)]
 mod tests {
-    use canopen_rs::NodeId;
 
     use pretty_assertions::assert_eq;
 
     use crate::{
         objects,
-        types::{AccessType, EntryRecord, Object, ObjectRecord},
+        types::{AccessType, EntryRecord, NodeId, Object, ObjectRecord},
     };
 
     use super::*;

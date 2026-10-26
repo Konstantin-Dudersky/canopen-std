@@ -40,9 +40,10 @@
 //! assert_eq!(&buf[..len], &[0xEF, 0xBE, 0x42]); // U16 little-endian, then U8
 //! ```
 
-use canopen_rs::types::NodeId;
-
-use crate::{types::Value, Error};
+use crate::{
+    Error,
+    types::{NodeId, Value},
+};
 
 use super::object_dictionary::{Address, ObjectDictionary};
 

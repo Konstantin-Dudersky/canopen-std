@@ -26,11 +26,9 @@
 //! assert!(od.write(Address::new(0x1000, 0), Value::Unsigned32(1)).is_err()); // read-only
 //! ```
 
-use canopen_rs::NodeId;
-
 use crate::{
     Error,
-    types::{Entry, Object, Value},
+    types::{Entry, NodeId, Object, Value},
 };
 
 /// An object dictionary holding up to `N` entries, addressed by
@@ -67,6 +65,7 @@ impl ObjectDictionary {
         self.objects.retain(|obj| obj.index() != new_object.index());
 
         self.objects.push(new_object);
+        self.objects.sort_by_key(|o| o.index());
     }
 
     /// Borrow the raw entry at `addr`, ignoring access rights.

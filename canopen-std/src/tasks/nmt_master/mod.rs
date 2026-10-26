@@ -1,9 +1,9 @@
-use canopen_rs::NodeId;
 use tokio::sync::mpsc;
 
 use crate::{
-    core::nmt::{encode_command, NmtCommand, NMT_COMMAND_COB_ID},
     Error, MsgOut,
+    core::nmt::{NMT_COMMAND_COB_ID, NmtCommand, encode_command},
+    types::NodeId,
 };
 
 pub struct TaskNmtMaster {

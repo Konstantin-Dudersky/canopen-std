@@ -6,7 +6,6 @@ use std::{
     time::{Duration, Instant},
 };
 
-use canopen_rs::NodeId;
 use embedded_can::Id;
 use tokio::{
     sync::{Mutex, mpsc},
@@ -14,7 +13,7 @@ use tokio::{
 };
 use tracing::warn;
 
-use crate::{core::nmt::NmtCommand, objects::ObjectDictionary};
+use crate::{core::nmt::NmtCommand, objects::ObjectDictionary, types::NodeId};
 
 pub struct TaskHeartbeatConsumer {
     pub input: mpsc::Receiver<Id>,

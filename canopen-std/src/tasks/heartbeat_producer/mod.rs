@@ -1,6 +1,5 @@
 use std::{collections::HashMap, sync::Arc, time::Duration};
 
-use canopen_rs::NodeId;
 use tokio::{
     sync::{Mutex, mpsc},
     time::sleep,
@@ -10,6 +9,7 @@ use crate::{
     Error, MsgOut,
     core::nmt::{NmtStateMachine, encode_heartbeat, heartbeat_cob_id},
     objects::ObjectDictionary,
+    types::NodeId,
 };
 
 use super::{StartupInfo, startup_info::id_to_string};

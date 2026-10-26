@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["core", "canopen-std"]
+members = ["canopen-std"]
 
 [workspace.package]
 version = "0.6.1"
@@ -14,14 +14,15 @@ categories = ["embedded", "network-programming"]
 
 [workspace.dependencies]
 # The no_std core, depended on by host crates.
-canopen-rs = { path = "core", version = "0.6.1" }
+# canopen-rs = { path = "core", version = "0.6.1" }
+comfy-table = { version = "8.0.1" }
 
 # Transport-agnostic CAN frame/id abstraction (no_std).
 embedded-can = "0.4.1"
 
 # # Bounded, allocation-free collections for the no_std object dictionary.
 # # DEPRECATED
-heapless = "0.8.0"
+heapless = "0.9.3"
 
 tokio = { version = "1.54.1", default-features = false, features = [ "macros", "rt", "sync" ,"time" ] }
 thiserror = { version = "2.0.21" }

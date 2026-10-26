@@ -1,10 +1,9 @@
 use std::time::Duration;
 
-use canopen_rs::NodeId;
 use embedded_can::{Id, StandardId};
 use tracing::error;
 
-use crate::Error;
+use crate::{Error, types::NodeId};
 
 use super::{super::PdoCommunicationCobId, RpdoTransmissionType};
 

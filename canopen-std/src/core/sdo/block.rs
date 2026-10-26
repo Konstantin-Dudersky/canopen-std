@@ -20,9 +20,10 @@
 //! assert_eq!(crc16(b"123456789"), 0x31C3);
 //! ```
 
+use crate::Error;
+
 use super::super::object_dictionary::Address;
 use super::SdoPayload;
-use canopen_rs::{Error, Result};
 
 // Block transfer uses just two command-specifier values in byte 0's top three
 // bits, swapped between client and server by direction:
@@ -119,7 +120,7 @@ pub fn encode_download_initiate(addr: Address, size: Option<u32>, crc_support: b
 }
 
 /// Decode a block-download initiate request.
-pub fn decode_download_initiate(p: &SdoPayload) -> Result<BlockInitiate> {
+pub fn decode_download_initiate(p: &SdoPayload) -> Result<BlockInitiate, Error> {
     decode_initiate_with_size(CS_6, p)
 }
 
@@ -133,7 +134,7 @@ pub fn encode_download_initiate_response(
 }
 
 /// Decode a block-download initiate response.
-pub fn decode_download_initiate_response(p: &SdoPayload) -> Result<BlockNegotiation> {
+pub fn decode_download_initiate_response(p: &SdoPayload) -> Result<BlockNegotiation, Error> {
     decode_initiate_with_blksize(CS_5, p)
 }
 
@@ -143,7 +144,7 @@ pub fn encode_upload_initiate(addr: Address, blksize: u8, crc_support: bool) -> 
 }
 
 /// Decode a block-upload initiate request.
-pub fn decode_upload_initiate(p: &SdoPayload) -> Result<BlockNegotiation> {
+pub fn decode_upload_initiate(p: &SdoPayload) -> Result<BlockNegotiation, Error> {
     decode_initiate_with_blksize(CS_5, p)
 }
 
@@ -157,7 +158,7 @@ pub fn encode_upload_initiate_response(
 }
 
 /// Decode a block-upload initiate response.
-pub fn decode_upload_initiate_response(p: &SdoPayload) -> Result<BlockInitiate> {
+pub fn decode_upload_initiate_response(p: &SdoPayload) -> Result<BlockInitiate, Error> {
     decode_initiate_with_size(CS_6, p)
 }
 
@@ -170,7 +171,7 @@ pub fn encode_upload_start() -> SdoPayload {
 }
 
 /// Decode a start block-upload request.
-pub fn decode_upload_start(p: &SdoPayload) -> Result<()> {
+pub fn decode_upload_start(p: &SdoPayload) -> Result<(), Error> {
     if p[0] & CS_MASK != CS_5 || p[0] & SUBCMD_MASK != SUBCMD_START {
         return Err(Error::UnexpectedCommand);
     }
@@ -191,7 +192,7 @@ fn encode_initiate_with_size(cs: u8, addr: Address, size: Option<u32>, crc: bool
     p
 }
 
-fn decode_initiate_with_size(cs: u8, p: &SdoPayload) -> Result<BlockInitiate> {
+fn decode_initiate_with_size(cs: u8, p: &SdoPayload) -> Result<BlockInitiate, Error> {
     // On a size-carrying initiate, bit 1 is the 's' flag, so the initiate/end
     // sub-command is bit 0 alone (0 = initiate); don't match the full 2 bits.
     if p[0] & CS_MASK != cs || p[0] & SUBCMD_END != 0 {
@@ -216,7 +217,7 @@ fn encode_initiate_with_blksize(cs: u8, addr: Address, blksize: u8, crc: bool) -
     p
 }
 
-fn decode_initiate_with_blksize(cs: u8, p: &SdoPayload) -> Result<BlockNegotiation> {
+fn decode_initiate_with_blksize(cs: u8, p: &SdoPayload) -> Result<BlockNegotiation, Error> {
     if p[0] & CS_MASK != cs || p[0] & SUBCMD_MASK != SUBCMD_INITIATE {
         return Err(Error::UnexpectedCommand);
     }
@@ -231,7 +232,7 @@ fn decode_initiate_with_blksize(cs: u8, p: &SdoPayload) -> Result<BlockNegotiati
 
 /// Encode a **sub-block segment** carrying 1..=7 bytes with sequence number
 /// `seqno` (`1..=127`); `last` marks the final segment of the transfer.
-pub fn encode_sub_segment(seqno: u8, data: &[u8], last: bool) -> Result<SdoPayload> {
+pub fn encode_sub_segment(seqno: u8, data: &[u8], last: bool) -> Result<SdoPayload, Error> {
     if seqno == 0 || seqno > MAX_BLKSIZE || data.is_empty() || data.len() > SEGMENT_DATA_MAX {
         return Err(Error::BadLength);
     }
@@ -265,7 +266,7 @@ pub fn encode_sub_response(ackseq: u8, blksize: u8) -> SdoPayload {
 }
 
 /// Decode a sub-block response into `(ackseq, blksize)`.
-pub fn decode_sub_response(p: &SdoPayload) -> Result<(u8, u8)> {
+pub fn decode_sub_response(p: &SdoPayload) -> Result<(u8, u8), Error> {
     if p[0] & CS_MASK != CS_5 || p[0] & SUBCMD_MASK != SUBCMD_RESPONSE {
         return Err(Error::UnexpectedCommand);
     }
@@ -283,7 +284,7 @@ pub fn encode_end(unused: u8, crc: u16) -> SdoPayload {
 }
 
 /// Decode an end frame into `(unused, crc)`.
-pub fn decode_end(p: &SdoPayload) -> Result<(u8, u16)> {
+pub fn decode_end(p: &SdoPayload) -> Result<(u8, u16), Error> {
     if p[0] & CS_MASK != CS_6 || p[0] & SUBCMD_MASK != SUBCMD_END {
         return Err(Error::UnexpectedCommand);
     }
@@ -299,7 +300,7 @@ pub fn encode_end_response() -> SdoPayload {
 }
 
 /// Decode an end response.
-pub fn decode_end_response(p: &SdoPayload) -> Result<()> {
+pub fn decode_end_response(p: &SdoPayload) -> Result<(), Error> {
     if p[0] & CS_MASK != CS_5 || p[0] & SUBCMD_MASK != SUBCMD_END {
         return Err(Error::UnexpectedCommand);
     }
@@ -406,7 +407,7 @@ impl<const N: usize> BlockReceiver<N> {
     ///
     /// Returns [`Error::Overflow`] beyond capacity `N`, or
     /// [`Error::UnexpectedCommand`] if the transfer is already complete.
-    pub fn push(&mut self, segment: &SubSegment) -> Result<()> {
+    pub fn push(&mut self, segment: &SubSegment) -> Result<(), Error> {
         if self.done {
             return Err(Error::UnexpectedCommand);
         }
@@ -422,7 +423,7 @@ impl<const N: usize> BlockReceiver<N> {
     ///
     /// Returns [`Error::BadLength`] if `unused` exceeds the buffer, or
     /// [`Error::CrcMismatch`] on a CRC failure.
-    pub fn finish(&mut self, unused: u8, crc: u16, verify_crc: bool) -> Result<&[u8]> {
+    pub fn finish(&mut self, unused: u8, crc: u16, verify_crc: bool) -> Result<&[u8], Error> {
         let unused = unused as usize;
         if unused > self.buf.len() {
             return Err(Error::BadLength);
@@ -437,6 +438,8 @@ impl<const N: usize> BlockReceiver<N> {
 
 #[cfg(test)]
 mod tests {
+    use assert_matches::assert_matches;
+
     use super::*;
 
     #[test]
@@ -548,7 +551,7 @@ mod tests {
             receiver.push(&decode_sub_segment(&seg)).unwrap();
         }
         let (unused, _) = decode_end(&writer.end_frame(true)).unwrap();
-        assert_eq!(
+        assert_matches!(
             receiver.finish(unused, 0x0000, true),
             Err(Error::CrcMismatch)
         );

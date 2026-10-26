@@ -8,15 +8,15 @@
 //! out-of-bounds panic it first surfaced are now fixed, and the corresponding
 //! tests assert the corrected behaviour.
 
-use canopen_rs::NodeId;
 use canopen_std::{
+    Address,
     objects::ObjectDictionary,
     sdo::{
-        client::SdoEvent, default_cob_id_client_to_server, default_cob_id_server_to_client,
-        encode_download_expedited, encode_download_initiate_segmented, SdoClient, SdoServer,
+        SdoClient, SdoServer, client::SdoEvent, default_cob_id_client_to_server,
+        default_cob_id_server_to_client, encode_download_expedited,
+        encode_download_initiate_segmented,
     },
-    types::{AccessType, ByteString, DataType, ObjectVar, Value},
-    Address,
+    types::{AccessType, ByteString, DataType, NodeId, ObjectVar, Value},
 };
 
 const NODE: u8 = 0x10;
@@ -288,7 +288,7 @@ fn string_longer_than_numeric_object_aborts() {
     let v = Value::VisibleString(ByteString::from_str("ABC").unwrap());
     let err = write(&mut c, &mut s, &mut od, NUM16, v);
     assert_eq!(err, Err(0x0607_0012)); // DataTypeMismatch, length too high
-                                       // The object is untouched.
+    // The object is untouched.
     assert_eq!(
         od.read(NUM16.index, NUM16.subindex).unwrap(),
         Value::Unsigned16(1000)

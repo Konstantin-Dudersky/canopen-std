@@ -3,12 +3,12 @@ mod sdo_server;
 pub use sdo_server::SdoServer;
 
 use bitvec::{field::BitField, order::Lsb0, view::BitView};
-use canopen_rs::NodeId;
 use embedded_can::{ExtendedId, Id, StandardId};
 
 use crate::{
     Error,
     sdo::{default_cob_id_client_to_server, default_cob_id_server_to_client},
+    types::NodeId,
 };
 
 use super::ObjectDictionary;

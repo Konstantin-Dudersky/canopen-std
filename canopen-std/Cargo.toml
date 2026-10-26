@@ -12,7 +12,7 @@ categories.workspace = true
 [dependencies]
 anyhow = { workspace = true }
 bitvec = { version = "1.1.1" }
-canopen-rs = { workspace = true, features = ["std"] }
+comfy-table = { workspace = true }
 embedded-can = { workspace = true }
 thiserror = { workspace = true }
 time = { version = "0.3.55", features = ["formatting", "local-offset", "macros"] }
@@ -21,6 +21,7 @@ tracing = { workspace = true }
 
 
 [dev-dependencies]
+assert_matches = "1.5"
 pretty_assertions = { version = "1.4.1" }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
 tracing-subscriber = { version = "0.3.23" }

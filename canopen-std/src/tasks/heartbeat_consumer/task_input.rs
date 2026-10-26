@@ -1,10 +1,9 @@
 use std::sync::Arc;
 
-use canopen_rs::NodeId;
 use embedded_can::Id;
-use tokio::sync::{mpsc, Mutex};
+use tokio::sync::{Mutex, mpsc};
 
-use crate::{core::nmt::HEARTBEAT_COB_BASE, Error};
+use crate::{Error, core::nmt::HEARTBEAT_COB_BASE, types::NodeId};
 
 use super::HeartbeatConsumerState;
 

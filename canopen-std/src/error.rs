@@ -8,9 +8,8 @@ pub enum Error {
     #[error("Error opening EDS file: {0}")]
     Edserror(#[from] crate::eds::EdsError),
 
-    #[error("Error from canopen_rs: {0}")]
-    CanopenRs(#[from] canopen_rs::Error),
-
+    // #[error("Error from canopen_rs: {0}")]
+    // CanopenRs(#[from] canopen_rs::Error),
     #[error("fn_input failed")]
     FnInput(anyhow::Error),
 

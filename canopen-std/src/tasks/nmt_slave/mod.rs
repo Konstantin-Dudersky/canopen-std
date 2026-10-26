@@ -5,15 +5,14 @@ mod task_main;
 
 use std::{sync::Arc, time::Duration};
 
-use canopen_rs::NodeId;
 use tokio::{
-    sync::{mpsc, Mutex},
+    sync::{Mutex, mpsc},
     task::JoinSet,
     time::sleep,
 };
 use tracing::warn;
 
-use crate::{core::nmt::NmtStateMachine, Error, MsgOut, NmtCommand};
+use crate::{Error, MsgOut, NmtCommand, core::nmt::NmtStateMachine, types::NodeId};
 
 use {task_heartbeat_consumer::TaskHeartbeatConsumer, task_input::TaskInput, task_main::TaskMain};
 

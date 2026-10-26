@@ -1,6 +1,6 @@
 use tokio::sync::mpsc;
 
-use crate::{types::Value, Error, MsgOut};
+use crate::{Error, MsgOut, types::Value};
 
 use super::int_msg::IntMsg;
 
@@ -13,7 +13,7 @@ impl TaskMain {
     pub async fn run(mut self) -> Result<(), Error> {
         while let Some(int_msg) = self.input.recv().await {
             let msg_out = MsgOut::ObjectChanged {
-                index: 0x2000,
+                index: 0x2001,
                 subindex: 1,
                 value: Value::Unsigned8(0x18),
             };

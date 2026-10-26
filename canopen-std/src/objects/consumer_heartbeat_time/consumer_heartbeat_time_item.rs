@@ -1,9 +1,11 @@
 use std::time::Duration;
 
 use bitvec::{field::BitField, order::Lsb0, view::BitView};
-use canopen_rs::NodeId;
 
-use crate::{Error, types::Value};
+use crate::{
+    Error,
+    types::{NodeId, Value},
+};
 
 #[derive(Debug)]
 pub struct ConsumerHeartbeatTimeItem {

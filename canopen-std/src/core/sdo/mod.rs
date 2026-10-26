@@ -35,14 +35,14 @@
 //! assert_eq!(frame, [0x23, 0x00, 0x20, 0x00, 0x78, 0x56, 0x34, 0x12]);
 //! ```
 
-use canopen_rs::NodeId;
 use embedded_can::{Id, StandardId};
 
-use super::object_dictionary::Address;
 use crate::{
-    types::{DataType, Value},
     Error,
+    types::{DataType, NodeId, Value},
 };
+
+use super::object_dictionary::Address;
 
 pub mod block;
 pub mod client;
@@ -58,8 +58,8 @@ const CCS_DOWNLOAD_SEGMENT: u8 = 0x00; // client: 000xxxxx
 const CCS_DOWNLOAD_INITIATE: u8 = 0x20; // client: 001xxxxx
 const CCS_UPLOAD_INITIATE: u8 = 0x40; // client: 010xxxxx
 const CCS_UPLOAD_SEGMENT: u8 = 0x60; // client: 011xxxxx
-                                     // The server's upload-segment specifier (scs 000) equals CCS_DOWNLOAD_SEGMENT,
-                                     // which is why one data-segment codec serves both directions.
+// The server's upload-segment specifier (scs 000) equals CCS_DOWNLOAD_SEGMENT,
+// which is why one data-segment codec serves both directions.
 const SCS_DOWNLOAD_SEGMENT: u8 = 0x20; // server: 001xxxxx
 const SCS_UPLOAD_INITIATE: u8 = 0x40; // server: 010xxxxx
 const SCS_DOWNLOAD_INITIATE: u8 = 0x60; // server: 011xxxxx

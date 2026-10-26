@@ -30,11 +30,11 @@
 mod address;
 pub use address::Address;
 
-use {canopen_rs::NodeId, std::collections::HashMap};
+use std::collections::HashMap;
 
 use crate::{
     Error,
-    types::{AccessType, Value},
+    types::{AccessType, NodeId, Value},
 };
 
 /// A single object dictionary entry: a typed value and its access rights.

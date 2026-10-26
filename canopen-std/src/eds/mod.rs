@@ -41,17 +41,17 @@ type EdsFileSection = BTreeMap<String, String>;
 
 use std::{collections::BTreeMap, fs, path::Path};
 
+use tracing::warn;
+
 use crate::{
     Error,
     core::object_dictionary::Address,
     objects::ObjectDictionary as ObjectDictionaryNew,
     types::{
-        AccessType, ByteString, DataType, Entry, EntryArray, EntryRecord, MAX_STRING_LEN, Object,
-        ObjectArray, ObjectRecord, ObjectType, ObjectVar, Value,
+        AccessType, ByteString, DataType, Entry, EntryArray, EntryRecord, MAX_STRING_LEN, NodeId,
+        Object, ObjectArray, ObjectRecord, ObjectType, ObjectVar, Value,
     },
 };
-use canopen_rs::NodeId;
-use tracing::warn;
 
 /// A parsed Electronic Data Sheet (or Device Configuration File).
 #[derive(Debug, Clone)]
@@ -210,10 +210,6 @@ impl Eds {
         }
 
         objects.sort_by_key(|o| o.index());
-
-        for object in &objects {
-            println!("{}", object);
-        }
 
         Ok(Eds {
             device_info,

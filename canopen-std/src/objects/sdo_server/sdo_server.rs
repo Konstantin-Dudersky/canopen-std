@@ -1,5 +1,6 @@
-use canopen_rs::NodeId;
 use embedded_can::Id;
+
+use crate::types::NodeId;
 
 /// 0x1200: SDO server parameter
 pub struct SdoServer {

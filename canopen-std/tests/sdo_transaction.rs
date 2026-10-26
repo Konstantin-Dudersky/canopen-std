@@ -7,13 +7,12 @@ use canopen_std::Address;
 use canopen_std::{
     objects::ObjectDictionary,
     sdo::{
-        client::SdoEvent, default_cob_id_client_to_server, default_cob_id_server_to_client,
-        SdoClient, SdoServer,
+        SdoClient, SdoServer, client::SdoEvent, default_cob_id_client_to_server,
+        default_cob_id_server_to_client,
     },
 };
 
-use canopen_rs::NodeId;
-use canopen_std::types::{AccessType, ByteString, DataType, ObjectVar, Value};
+use canopen_std::types::{AccessType, ByteString, DataType, NodeId, ObjectVar, Value};
 
 const NODE: u8 = 0x10;
 
