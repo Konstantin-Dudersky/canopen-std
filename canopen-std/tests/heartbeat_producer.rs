@@ -6,10 +6,12 @@ use tokio::sync::mpsc;
 
 mod common;
 
-use common::recv_until;
+use common::{init_logging, recv_until};
 
 #[tokio::test]
 async fn test() {
+    init_logging();
+
     let node_id = 0x17;
 
     let (_tx_to_canopen, rx_to_canopen) = mpsc::channel::<MsgIn>(100);

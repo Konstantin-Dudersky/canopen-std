@@ -3,7 +3,7 @@ use super::super::common::PdoMappingItem;
 /// 0x1600..=0x17FF: RPDO mapping parameter
 #[derive(Debug, Default)]
 pub struct RpdoMapping {
-    pub sequence_number: u16,
+    pub seq_number: u16,
     pub items: Vec<PdoMappingItem>,
 }
 
@@ -11,11 +11,11 @@ impl RpdoMapping {
     pub const INDEX_BASE: u16 = 0x1600;
 
     pub const fn index(&self) -> u16 {
-        Self::INDEX_BASE + self.sequence_number
+        Self::INDEX_BASE + self.seq_number
     }
 
     pub fn name(&self) -> String {
-        format!("RPDO mapping parameter #{}", self.sequence_number + 1)
+        format!("RPDO mapping parameter #{}", self.seq_number + 1)
     }
 
     pub fn bit_size(&self) -> usize {
@@ -32,7 +32,7 @@ mod tests {
     #[test]
     fn bit_size() {
         let rpdo = RpdoMapping {
-            sequence_number: 1,
+            seq_number: 1,
             items: vec![
                 PdoMappingItem {
                     index: 0x2000,

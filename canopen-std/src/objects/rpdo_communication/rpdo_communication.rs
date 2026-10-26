@@ -11,7 +11,7 @@ use super::{super::PdoCommunicationCobId, RpdoTransmissionType};
 /// 0x1400..=0x15FF: RPDO communication parameter
 #[derive(Debug)]
 pub struct RpdoCommunication {
-    pub sequence_number: u16,
+    pub seq_number: u16,
 
     /// 1 = PDO exists
     pub pdo_exist: bool,
@@ -38,15 +38,15 @@ impl RpdoCommunication {
     pub const INDEX_BASE: u16 = 0x1400;
 
     pub const fn index(&self) -> u16 {
-        Self::INDEX_BASE + self.sequence_number
+        Self::INDEX_BASE + self.seq_number
     }
 
     pub fn name(&self) -> String {
-        format!("RPDO communication parameter #{}", self.sequence_number + 1)
+        format!("RPDO communication parameter #{}", self.seq_number + 1)
     }
 
     pub fn get_cob_id_offset(&self) -> Result<u32, Error> {
-        let offset = match self.sequence_number {
+        let offset = match self.seq_number {
             0 => 0x200,
             1 => 0x300,
             2 => 0x400,
@@ -61,7 +61,7 @@ impl RpdoCommunication {
 
     pub fn get_cob_id_for_node(&self, node_id: NodeId) -> Result<Id, Error> {
         match self.cob_id {
-            PdoCommunicationCobId::RelativeNodeId => {
+            PdoCommunicationCobId::RelativeSelfNodeId => {
                 let cob_id_base = self.get_cob_id_offset()?;
                 let cob_id = cob_id_base + node_id.raw() as u32;
                 let id = StandardId::new(cob_id as u16).ok_or(Error::InvalidCobId)?;
@@ -75,9 +75,9 @@ impl RpdoCommunication {
 impl Default for RpdoCommunication {
     fn default() -> Self {
         Self {
-            sequence_number: 0,
+            seq_number: 0,
             pdo_exist: false,
-            cob_id: PdoCommunicationCobId::RelativeNodeId,
+            cob_id: PdoCommunicationCobId::RelativeSelfNodeId,
             transmission_type: RpdoTransmissionType::Syncronous,
             inhibit_time: Duration::default(),
             event_timer: Duration::default(),

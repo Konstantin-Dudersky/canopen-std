@@ -3,11 +3,8 @@ use crate::{Error, objects::ObjectDictionary};
 use super::TpdoCommunication;
 
 impl ObjectDictionary {
-    pub fn read_tpdo_communication(
-        &self,
-        sequence_number: u16,
-    ) -> Result<TpdoCommunication, Error> {
-        let index = 0x1800 + sequence_number;
+    pub fn read_tpdo_communication(&self, seq_number: u16) -> Result<TpdoCommunication, Error> {
+        let index = 0x1800 + seq_number;
 
         let obj = self.get_object(index);
 

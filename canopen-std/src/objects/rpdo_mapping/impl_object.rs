@@ -32,7 +32,7 @@ impl TryFrom<&Object> for RpdoMapping {
         let items = PdoMappingItem::convert_entries_to_items(&entries)?;
 
         Ok(RpdoMapping {
-            sequence_number,
+            seq_number: sequence_number,
             items,
         })
     }

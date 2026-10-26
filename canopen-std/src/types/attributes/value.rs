@@ -88,7 +88,7 @@ impl Value {
             Value::Integer8(_) => todo!(),
             Value::Integer16(_) => todo!(),
             Value::Integer32(_) => todo!(),
-            Value::Unsigned8(_) => todo!(),
+            Value::Unsigned8(v) => buf[start..stop].store_le(*v),
             Value::Unsigned16(v) => buf[start..stop].store_le(*v),
             Value::Unsigned32(_) => todo!(),
             Value::Real32(_) => todo!(),

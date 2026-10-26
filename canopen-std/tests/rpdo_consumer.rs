@@ -29,16 +29,16 @@ async fn rpdo_consumer() {
         eds_file: "",
         objects: vec![
             objects::RpdoCommunication {
-                sequence_number: 0,
+                seq_number: 0,
                 pdo_exist: true,
-                cob_id: objects::PdoCommunicationCobId::RelativeNodeId,
+                cob_id: objects::PdoCommunicationCobId::RelativeSelfNodeId,
                 transmission_type: objects::RpdoTransmissionType::EventDrivenManufacturer,
                 inhibit_time: Duration::from_millis(0),
                 event_timer: Duration::from_millis(0),
             }
             .into(),
             objects::RpdoMapping {
-                sequence_number: 0,
+                seq_number: 0,
                 items: vec![
                     objects::PdoMappingItem {
                         index: 0x2000,

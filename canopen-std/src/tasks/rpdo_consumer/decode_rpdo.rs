@@ -62,7 +62,7 @@ mod tests {
         // Заполняем словарь объектов
         let objects: Vec<Object> = vec![
             RpdoMapping {
-                sequence_number: 0,
+                seq_number: 0,
                 items: vec![
                     objects::PdoMappingItem {
                         index: 0x2000,

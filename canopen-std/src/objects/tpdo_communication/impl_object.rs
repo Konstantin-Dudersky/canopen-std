@@ -14,7 +14,7 @@ use super::{TpdoCommunication, TpdoTransmissionType};
 impl From<TpdoCommunication> for Object {
     fn from(tpdo: TpdoCommunication) -> Self {
         let value_cob_id: Value = match tpdo.cob_id {
-            PdoCommunicationCobId::RelativeNodeId => Value::RelativeNodeId(
+            PdoCommunicationCobId::RelativeSelfNodeId => Value::RelativeNodeId(
                 tpdo.get_cob_id_offset()
                     .expect("Относительный адрес может быть только для первых 4 конфигураций")
                     as u16,
@@ -95,7 +95,7 @@ impl TryFrom<&Object> for TpdoCommunication {
                 let (pdo_exist, _, cob_id) = decode_cob_id(entry.value)?;
                 (pdo_exist, PdoCommunicationCobId::Specific(cob_id))
             }
-            Value::RelativeNodeId(_) => (true, PdoCommunicationCobId::RelativeNodeId),
+            Value::RelativeNodeId(_) => (true, PdoCommunicationCobId::RelativeSelfNodeId),
             _ => return Err(Error::TypeMismatch),
         };
 
@@ -134,7 +134,7 @@ impl TryFrom<&Object> for TpdoCommunication {
         };
 
         Ok(TpdoCommunication {
-            sequence_number,
+            seq_number: sequence_number,
             pdo_exist,
             cob_id,
             transmission_type,

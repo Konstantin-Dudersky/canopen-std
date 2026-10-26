@@ -1,4 +1,4 @@
-use std::{sync::Arc, time::Duration};
+use std::{collections::HashMap, sync::Arc, time::Duration};
 
 use tokio::{
     sync::{Mutex, mpsc},
@@ -9,18 +9,27 @@ use crate::{
     Error, MsgOut,
     core::sync::{SyncCounter, encode_counter},
     objects::ObjectDictionary,
+    tasks::{StartupInfo, startup_info::id_to_string},
 };
 
 pub struct TaskSyncProducer {
     pub output: mpsc::Sender<MsgOut>,
     pub od: Arc<Mutex<ObjectDictionary>>,
+    pub startup_info: Arc<Mutex<StartupInfo>>,
 }
 
 impl TaskSyncProducer {
     pub async fn run(self) -> Result<(), Error> {
+        let mut startup_info: HashMap<String, String> = HashMap::new();
+
         let obj_0x1005 = self.od.lock().await.read_sync_message_cob_id()?;
         // Выходим, если генерация SYNC сообщений отключена
         if !obj_0x1005.device_generate_sync {
+            startup_info.insert("Status".into(), "disabled".into());
+            self.startup_info
+                .lock()
+                .await
+                .add_task_info("SYNC producer", startup_info);
             return Ok(());
         }
         let cob_id_sync_message = obj_0x1005.cob_id;
@@ -34,6 +43,14 @@ impl TaskSyncProducer {
 
         let obj_0x1019 = self.od.lock().await.read_sync_counter_overflow()?;
         let counter_overflow = obj_0x1019.counter;
+
+        startup_info.insert("Time".into(), format!("{:?}", period));
+        startup_info.insert("COB-ID".into(), id_to_string(cob_id_sync_message));
+        startup_info.insert("Counter".into(), counter_overflow.to_string());
+        self.startup_info
+            .lock()
+            .await
+            .add_task_info("SYNC producer", startup_info);
 
         let mut counter = SyncCounter::new(counter_overflow)?;
 

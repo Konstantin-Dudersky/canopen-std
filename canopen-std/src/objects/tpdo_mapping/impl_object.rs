@@ -32,7 +32,7 @@ impl TryFrom<&Object> for TpdoMapping {
         let items = PdoMappingItem::convert_entries_to_items(&entries)?;
 
         Ok(TpdoMapping {
-            sequence_number,
+            seq_number: sequence_number,
             items,
         })
     }

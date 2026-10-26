@@ -7,12 +7,12 @@ mod timer;
 use std::{collections::HashMap, sync::Arc};
 
 use tokio::{
-    sync::{broadcast, mpsc, Mutex, Notify},
+    sync::{Mutex, Notify, broadcast, mpsc},
     task::JoinSet,
 };
 use tracing::error;
 
-use crate::{objects::ObjectDictionary, Error, MsgOut};
+use crate::{Error, MsgOut, objects::ObjectDictionary, tasks::startup_info::id_to_string};
 
 use super::StartupInfo;
 
@@ -34,7 +34,10 @@ impl TaskTpdoProducer {
             .lock()
             .await
             .read_tpdo_communication(self.tpdo_index)?;
-        info.insert("COB-ID".into(), format!("{:x?} (0x)", config.cob_id));
+
+        let node_id = self.od.lock().await.node_id;
+        let id = config.get_cob_id_for_node(node_id)?;
+        info.insert("COB-ID".into(), id_to_string(id));
 
         let mapping = self.od.lock().await.read_tpdo_mapping(self.tpdo_index)?;
 

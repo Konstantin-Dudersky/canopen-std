@@ -110,6 +110,7 @@ impl CANopenNode {
         let task = tasks::TaskSyncProducer {
             output: self.output.clone(),
             od: od.clone(),
+            startup_info: startup_info.clone(),
         };
         task_set.spawn(task.run());
 
@@ -206,7 +207,7 @@ async fn spawn_tpdo_producer(
             .read_tpdo_communication(tpdo_index)?
             .pdo_exist;
         if !pdo_exist {
-            break;
+            continue;
         }
 
         count += 1;
