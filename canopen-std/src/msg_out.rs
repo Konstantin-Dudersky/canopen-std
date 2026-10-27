@@ -6,11 +6,21 @@ pub enum MsgOut {
         id: embedded_can::Id,
         data: Vec<u8>,
     },
+
     NmtStateChanged(NmtState),
+
     SyncReceived {
         counter: Option<u8>,
     },
+
     ObjectChanged {
+        index: u16,
+        subindex: u8,
+        value: Value,
+    },
+
+    SdoRead {
+        node_id: u16,
         index: u16,
         subindex: u8,
         value: Value,

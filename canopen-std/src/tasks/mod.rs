@@ -5,6 +5,7 @@ mod nmt_master;
 mod nmt_slave;
 mod od_change;
 mod rpdo_consumer;
+mod sdo_client;
 mod sdo_server;
 mod startup_info;
 mod sync_consumer;

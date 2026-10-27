@@ -11,7 +11,18 @@ pub enum MsgIn {
         target: u8,
         command: NmtCommand,
     },
-    OdChange {
+    ObjectDictdChange {
+        index: u16,
+        subindex: u8,
+        value: Value,
+    },
+    SdoRead {
+        node_id: u8,
+        index: u16,
+        subindex: u8,
+    },
+    SdoWrite {
+        node_id: u8,
         index: u16,
         subindex: u8,
         value: Value,

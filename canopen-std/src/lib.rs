@@ -1,3 +1,6 @@
+// #![warn(clippy::unwrap_used)]
+// #![warn(missing_docs)]
+
 mod canopen_node;
 mod core;
 mod error;

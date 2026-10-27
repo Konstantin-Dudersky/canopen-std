@@ -29,27 +29,27 @@ impl TaskRpdoConsumer {
     pub async fn run(self) -> Result<(), Error> {
         let mut info: HashMap<String, String> = HashMap::new();
 
-        let config = self
+        let rpdo_config = self
             .od
             .lock()
             .await
             .read_rpdo_communication(self.sequence_number)?;
         let node_id = self.od.lock().await.node_id;
-        let id = config.get_cob_id_for_node(node_id)?;
+        let id = rpdo_config.get_cob_id_for_node(node_id)?;
 
         info.insert("COB-ID".into(), id_to_string(id));
         info.insert(
             "Transmission type".into(),
-            config.transmission_type.to_string(),
+            rpdo_config.transmission_type.to_string(),
         );
 
-        let _mapping = self
+        let rpdo_mapping = self
             .od
             .lock()
             .await
             .read_rpdo_mapping(self.sequence_number)?;
 
-        let task_name = format!("RPDO №{}", self.sequence_number);
+        let task_name = format!("RPDO #{}", self.sequence_number);
         self.startup_info
             .lock()
             .await
@@ -74,6 +74,9 @@ impl TaskRpdoConsumer {
         let task = task_main::TaskMain {
             input: rx,
             output: self.output,
+            od: self.od.clone(),
+            rpdo_config,
+            rpdo_mapping,
         };
         task_set.spawn(task.run());
 

@@ -4,7 +4,7 @@ use super::TpdoCommunication;
 
 impl ObjectDictionary {
     pub fn read_tpdo_communication(&self, seq_number: u16) -> Result<TpdoCommunication, Error> {
-        let index = 0x1800 + seq_number;
+        let index = TpdoCommunication::INDEX_BASE + seq_number;
 
         let obj = self.get_object(index);
 

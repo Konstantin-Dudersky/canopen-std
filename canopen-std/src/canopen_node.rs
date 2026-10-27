@@ -48,19 +48,17 @@ impl CANopenNode {
         self.add_entries(&mut od).unwrap();
 
         // Выводим содержимое объектного словаря
+        println!("The contents of the object dictionary:");
         let mut table = Table::new();
         table
             .load_style(UTF8_FULL.with_rounded_corners())
             .set_content_arrangement(ContentArrangement::Dynamic)
-            // .set_width(80)
-            .set_header(vec!["Index\nsubindex", "Description", "Value", "Type"]);
-
+            .set_header(vec!["Index /\nsubindex", "Description", "Value", "Type"]);
         for object in od.iter() {
             for row in object.to_table_rows() {
                 table.add_row(row);
             }
         }
-
         println!("{table}");
 
         let od = Arc::new(Mutex::new(od));
@@ -217,11 +215,11 @@ async fn spawn_tpdo_producer(
 ) -> Result<(), Error> {
     let mut count = 0;
 
-    for tpdo_index in 0..4 {
+    for tpdo_seq_number in 0..4 {
         let pdo_exist = od
             .lock()
             .await
-            .read_tpdo_communication(tpdo_index)?
+            .read_tpdo_communication(tpdo_seq_number)?
             .pdo_exist;
         if !pdo_exist {
             continue;
@@ -234,7 +232,7 @@ async fn spawn_tpdo_producer(
             input_od_changed: rx_od_changed.resubscribe(),
             output: output.clone(),
             od: od.clone(),
-            tpdo_index,
+            tpdo_index: tpdo_seq_number,
             startup_info: startup_info.clone(),
         };
         task_set.spawn(task.run());

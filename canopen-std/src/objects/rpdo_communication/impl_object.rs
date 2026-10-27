@@ -75,19 +75,19 @@ impl TryFrom<&Object> for RpdoCommunication {
 
     fn try_from(obj: &Object) -> Result<Self, Self::Error> {
         let index = obj.index();
-        let sequence_number = index - Self::INDEX_BASE;
+        let seq_number = index - Self::INDEX_BASE;
 
         // COB-ID used by TPDO
         let subindex = RpdoCommunication::SUBINDEX_COB_ID;
         let entry = obj
             .get_entry(subindex)
             .ok_or(Error::EntryNotFound { index, subindex })?;
-        let (pdo_exist, cob_id) = match entry.value {
+        let (pdo_not_exist, cob_id) = match entry.value {
             Value::Unsigned32(_) => {
-                let (pdo_exist, _, cob_id) = decode_cob_id(entry.value)?;
-                (pdo_exist, PdoCommunicationCobId::Specific(cob_id))
+                let (pdo_not_exist, _, cob_id) = decode_cob_id(entry.value)?;
+                (pdo_not_exist, PdoCommunicationCobId::Specific(cob_id))
             }
-            Value::RelativeNodeId(_) => (true, PdoCommunicationCobId::RelativeSelfNodeId),
+            Value::RelativeNodeId(_) => (false, PdoCommunicationCobId::RelativeSelfNodeId),
             _ => return Err(Error::TypeMismatch),
         };
 
@@ -119,8 +119,8 @@ impl TryFrom<&Object> for RpdoCommunication {
         };
 
         Ok(RpdoCommunication {
-            seq_number: sequence_number,
-            pdo_exist,
+            seq_number,
+            pdo_exist: !pdo_not_exist,
             cob_id,
             transmission_type,
             inhibit_time,

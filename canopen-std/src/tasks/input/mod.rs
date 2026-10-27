@@ -1,16 +1,16 @@
 use std::{collections::HashMap, sync::Arc};
 
 use embedded_can::{Id, StandardId};
-use tokio::sync::{mpsc, Mutex};
+use tokio::sync::{Mutex, mpsc};
 
 use crate::{
+    Error, MsgIn,
     core::{
-        nmt::{NmtCommand, HEARTBEAT_COB_BASE, NMT_COMMAND_COB_ID},
+        nmt::{HEARTBEAT_COB_BASE, NMT_COMMAND_COB_ID, NmtCommand},
         sync::{self, SYNC_COB_ID},
     },
     objects::ObjectDictionary,
     types::Value,
-    Error, MsgIn,
 };
 
 pub struct Input {
@@ -52,14 +52,14 @@ impl Input {
             match msg_in {
                 MsgIn::CanFrame { id, data } => {
                     if id == cob_id_nmt {
-                        // NMT
+                        // NMT command from master
                         self.output_nmt_slave.send(data).await.unwrap();
                     } else if id == cob_id_sync {
                         // SYNC
                         let data = sync::decode(&data)?;
                         self.output_sync_consumer.send(data).await.unwrap();
                     } else if id == cob_id_sdo_server {
-                        // SDO request
+                        // SDO request from server
                         self.output_sdo_server.send((id, data)).await.unwrap();
                     } else if id >= cob_id_heartbeat_min && id <= cob_id_heartbeat_max {
                         // Heartbeat
@@ -80,7 +80,8 @@ impl Input {
                         .await
                         .unwrap();
                 }
-                MsgIn::OdChange {
+
+                MsgIn::ObjectDictdChange {
                     index,
                     subindex,
                     value,
@@ -89,6 +90,10 @@ impl Input {
                     .send((index, subindex, value))
                     .await
                     .unwrap(),
+
+                MsgIn::SdoRead { .. } => {}
+
+                MsgIn::SdoWrite { .. } => {}
             }
         }
 

@@ -54,7 +54,7 @@ pub async fn counter(tx: mpsc::Sender<MsgIn>) {
     let mut counter = 0;
     loop {
         sleep(Duration::from_millis(100)).await;
-        tx.send(MsgIn::OdChange {
+        tx.send(MsgIn::ObjectDictdChange {
             index: 0x2000,
             subindex: 0,
             value: Value::Unsigned16(counter),

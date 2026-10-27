@@ -7,8 +7,8 @@ use crate::{
 };
 
 /// Расшифровываем данные RPDO
-fn decode_rpdo(
-    rpdo_maping: RpdoMapping,
+pub(crate) fn decode_rpdo(
+    rpdo_maping: &RpdoMapping,
     rpdo_data: &[u8],
     od: &ObjectDictionary,
 ) -> Result<Vec<(u16, u8, Value)>, Error> {
@@ -21,7 +21,7 @@ fn decode_rpdo(
 
     let mut values = vec![];
 
-    for map in rpdo_maping.items {
+    for map in &rpdo_maping.items {
         let od_entry = od.get_entry(map.index, map.subindex).unwrap();
 
         let od_size = od_entry.value.data_type().bit_size();
@@ -104,7 +104,7 @@ mod tests {
 
         let rpdo_mapping = od.read_rpdo_mapping(0).unwrap();
 
-        let left = decode_rpdo(rpdo_mapping, &rpdo_data, &od).unwrap();
+        let left = decode_rpdo(&rpdo_mapping, &rpdo_data, &od).unwrap();
 
         let right = vec![
             (0x2000, 1, Value::Boolean(true)),

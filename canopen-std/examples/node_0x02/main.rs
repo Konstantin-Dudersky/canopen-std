@@ -20,7 +20,7 @@ async fn main() {
     let (tx_from_canopen, rx_from_canopen) = mpsc::channel::<MsgOut>(100);
 
     // Запускаем CANopen узел
-    let node = CANopenNode {
+    let node: CANopenNode = CANopenNode {
         input: rx_to_canopen,
         output: tx_from_canopen,
         node_id: 0x02,
@@ -49,7 +49,7 @@ pub async fn counter(tx: mpsc::Sender<MsgIn>) {
     let mut counter = 0;
     loop {
         sleep(Duration::from_millis(100)).await;
-        tx.send(MsgIn::OdChange {
+        tx.send(MsgIn::ObjectDictdChange {
             index: 0x2000,
             subindex: 0,
             value: Value::Unsigned16(counter),

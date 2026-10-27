@@ -89,6 +89,7 @@ async fn rpdo_consumer() {
         .unwrap();
 
     let msg = recv_until(&mut rx_from_canopen, Duration::from_secs(1), |m| {
+        tracing::info!("Message: {:?}", m);
         let (index, subindex, value) = match m {
             MsgOut::ObjectChanged {
                 index,
@@ -98,15 +99,7 @@ async fn rpdo_consumer() {
             _ => return false,
         };
 
-        if index != 0x2000 || subindex != 1 {
-            return false;
-        }
-
-        if value != Value::Unsigned8(0x18) {
-            return false;
-        }
-
-        true
+        index == 0x2000 && subindex == 2 && value == Value::Unsigned8(0x18)
     })
     .await;
 
